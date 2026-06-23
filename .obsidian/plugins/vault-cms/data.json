@@ -43,7 +43,9 @@
     "file-name-history",
     "settings-search",
     "tag-wrangler",
-    "zenmode"
+    "zenmode",
+    "omnisearch",
+    "vault-nickname"
   ],
   "disabledPlugins": [],
   "theme": "",
@@ -51,20 +53,34 @@
     "views": []
   },
   "astroComposerConfig": {
-    "customContentTypes": [],
+    "customContentTypes": [
+      {
+        "id": "content-type-roast",
+        "name": "Roasts",
+        "folder": "src/content/roasts",
+        "template": "---\ntitle: \"{{title}}\"\ndate: {{date}}\ntarget_level: Medium\nroaster: Behmor 2000 AB Plus\nbatch_size_g: 227\nprofile: P1\nweight_setting: ½ lb\ntags:\n  - roast\ndraft: true\n---\n\n# Bean notes\n\n# Playbook\n\n# Interventions\n\n# Anything weird\n\n# Tasting notes\n\n# Next time\n",
+        "enabled": true,
+        "linkBasePath": "/roasts/",
+        "creationMode": "file",
+        "indexFileName": "index"
+      }
+    ],
     "defaultTemplate": "",
-    "configFilePath": "",
-    "terminalProjectRootPath": ""
+    "configFilePath": "astro.config.mjs",
+    "terminalProjectRootPath": ".",
+    "showMdxFilesInExplorer": false
   },
   "seoConfig": {
     "titleProperty": "title",
+    "descriptionProperty": "origin",
     "scanDirectories": "src/content/roasts",
     "useFilenameAsTitle": false,
     "useFilenameAsSlug": true,
     "enableMDXSupport": false
   },
   "propertyOverFileName": {
-    "propertyKey": "title"
+    "propertyKey": "title",
+    "enableMdxSupport": false
   },
   "imageManager": {
     "enableRenameOnPaste": true,
@@ -215,18 +231,27 @@
     "hideReleaseNotes": false,
     "stickyIconReplaceTab": false
   },
-  "explorerFocus": {},
+  "explorerFocus": {
+    "showRightClickMenu": true,
+    "showFileExplorerIcon": true,
+    "focusLevel": "parent",
+    "hideAncestorFolders": false
+  },
   "ignoreConfig": {
-    "gitIgnoreConfigured": false,
+    "gitIgnoreConfigured": true,
     "viteIgnoreConfigured": false
   },
   "gitConfig": {
     "enabled": false,
     "isPrivate": false,
     "branchName": "main",
-    "autoConfigureObsidianGit": false
+    "autoConfigureObsidianGit": false,
+    "repoName": "roastbook-spike"
   },
+  "deploymentPlatform": "github-pages",
+  "resolvePublicImages": true,
   "runWizardOnStartup": false,
   "wizardCompleted": true,
-  "enableMdxSupport": false
+  "enableMdxSupport": false,
+  "defaultContentTypeId": "content-type-roast"
 }

@@ -16,7 +16,7 @@ const roastLevel = z.enum([
 
 const roasts = defineCollection({
   loader: glob({
-    pattern: "**/*.md",
+    pattern: ["**/*.md", "!_*.md"],
     base: "./src/content/roasts",
   }),
   schema: ({ image }) =>

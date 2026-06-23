@@ -6,12 +6,12 @@
   "copyHeadingLinkFormat": "astro",
   "addTrailingSlashToLinks": true,
   "enableOpenTerminalCommand": true,
-  "terminalProjectRootPath": "../../",
+  "terminalProjectRootPath": ".",
   "terminalApplicationName": "",
   "enableTerminalDebugLogging": false,
   "enableTerminalRibbonIcon": true,
   "enableOpenConfigFileCommand": true,
-  "configFilePath": "../../astro.config.mjs",
+  "configFilePath": "astro.config.mjs",
   "enableConfigRibbonIcon": true,
   "contentTypes": [
     {

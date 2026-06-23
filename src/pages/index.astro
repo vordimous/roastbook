@@ -1,25 +1,63 @@
 ---
 import { getCollection } from "astro:content";
 
-const roasts = await getCollection("roasts");
+const roasts = (await getCollection("roasts"))
+  .filter((r) => !r.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>roastbook-spike</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        max-width: 760px;
+        margin: 2rem auto;
+        padding: 0 1.25rem;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(127, 127, 127, 0.2);
+      }
+      a {
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .date {
+        color: #888;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+      }
+      .level {
+        color: #888;
+        font-size: 0.85rem;
+        margin-left: 0.5rem;
+      }
+    </style>
   </head>
   <body>
     <h1>roastbook-spike</h1>
     <p>
-      Minimal scaffold. Purpose: validate astro-editor against the intended
-      Zod schema. See <code>spike-findings.md</code>.
+      Phase-0 scaffold. <code>pnpm dev</code> serves this list; click a roast
+      to render frontmatter + body.
     </p>
     <ul>
       {
         roasts.map((r) => (
           <li>
-            <strong>{r.id}</strong> — {r.data.title} ({r.data.target_level})
+            <span class="date">{r.data.date.toISOString().slice(0, 10)}</span>
+            <a href={`/roasts/${r.id}/`}>{r.data.title}</a>
+            <span class="level">· {r.data.target_level}</span>
           </li>
         ))
       }
