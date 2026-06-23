@@ -1,0 +1,232 @@
+{
+  "projectRoot": ".",
+  "configFilePath": "astro.config.mjs",
+  "contentTypes": [
+    {
+      "id": "content-type-roast",
+      "name": "Roasts",
+      "folder": "src/content/roasts",
+      "fileOrganization": "file",
+      "enabled": true,
+      "indexFileName": "index",
+      "linkBasePath": "/roasts/"
+    }
+  ],
+  "frontmatterProperties": {
+    "content-type-roast": {
+      "titleProperty": "title",
+      "dateProperty": "date",
+      "descriptionProperty": "origin",
+      "tagsProperty": "tags",
+      "draftLogic": "true-draft",
+      "hasDraftStatus": true,
+      "template": "---\ntitle: \"{{title}}\"\ndate: {{date}}\ntarget_level: Medium\nroaster: Behmor 2000 AB Plus\nbatch_size_g: 227\nprofile: P1\nweight_setting: ½ lb\ntags:\n  - roast\ndraft: true\n---\n\n# Bean notes\n\n# Playbook\n\n# Interventions\n\n# Anything weird\n\n# Tasting notes\n\n# Next time\n"
+    }
+  },
+  "attachmentHandlingMode": "subfolder",
+  "preset": "vanilla",
+  "presetName": "",
+  "presetsRepo": "davidvkimball/vaultcms-presets",
+  "enableEditingToolbar": false,
+  "enableExtendedFileTypes": false,
+  "enabledPlugins": [
+    "astro-composer",
+    "bases-cms",
+    "editing-toolbar",
+    "home-base",
+    "image-manager",
+    "property-over-file-name",
+    "seo",
+    "ui-tweaker",
+    "data-files-editor",
+    "explorer-focus",
+    "file-name-history",
+    "settings-search",
+    "tag-wrangler",
+    "zenmode"
+  ],
+  "disabledPlugins": [],
+  "theme": "",
+  "basesCMSConfig": {
+    "views": []
+  },
+  "astroComposerConfig": {
+    "customContentTypes": [],
+    "defaultTemplate": "",
+    "configFilePath": "",
+    "terminalProjectRootPath": ""
+  },
+  "seoConfig": {
+    "titleProperty": "title",
+    "scanDirectories": "src/content/roasts",
+    "useFilenameAsTitle": false,
+    "useFilenameAsSlug": true,
+    "enableMDXSupport": false
+  },
+  "propertyOverFileName": {
+    "propertyKey": "title"
+  },
+  "imageManager": {
+    "enableRenameOnPaste": true,
+    "enableRenameOnDrop": true,
+    "imageNameTemplate": "",
+    "attachmentLocation": "obsidian",
+    "customAttachmentPath": "./assets",
+    "defaultProvider": "unsplash",
+    "unsplashProxyServer": "",
+    "pexelsApiKey": "",
+    "pexelsApiKeySecretId": "",
+    "pixabayApiKey": "",
+    "pixabayApiKeySecretId": "",
+    "defaultOrientation": "any",
+    "defaultImageSize": "large",
+    "enablePropertyPaste": true,
+    "propertyLinkFormat": "obsidian",
+    "customPropertyLinkFormat": "{image-url}",
+    "defaultPropertyName": "banner",
+    "defaultIconPropertyName": "icon",
+    "altTextProperty": "",
+    "autoConvertRemoteImages": false,
+    "convertOnNoteOpen": false,
+    "convertOnNoteSave": false,
+    "processBackgroundChanges": true,
+    "showRenameDialog": true,
+    "autoRename": false,
+    "dupNumberDelimiter": "-",
+    "dupNumberAtStart": false,
+    "disableRenameNotice": false,
+    "enableDescriptiveImages": true,
+    "insertSize": "",
+    "insertReferral": true,
+    "insertBackLink": false,
+    "appendReferral": false,
+    "banner": {
+      "properties": {
+        "imageProperty": "banner",
+        "iconProperty": "icon"
+      },
+      "desktop": {
+        "enabled": true,
+        "height": 240,
+        "viewOffset": 0,
+        "noteOffset": -32,
+        "borderRadius": [
+          8,
+          8,
+          8,
+          8
+        ],
+        "padding": 8,
+        "fade": true,
+        "iconEnabled": false,
+        "iconSize": 96,
+        "iconRadius": 8,
+        "iconBackground": true,
+        "iconBorder": 2,
+        "iconFrame": true,
+        "iconAlignmentH": "flex-start",
+        "iconAlignmentV": "flex-end",
+        "iconOffsetX": 0,
+        "iconOffsetY": -24
+      },
+      "tablet": {
+        "enabled": true,
+        "height": 190,
+        "viewOffset": 0,
+        "noteOffset": -32,
+        "borderRadius": [
+          8,
+          8,
+          8,
+          8
+        ],
+        "padding": 8,
+        "fade": true,
+        "iconEnabled": false,
+        "iconSize": 96,
+        "iconRadius": 8,
+        "iconBackground": true,
+        "iconBorder": 2,
+        "iconFrame": true,
+        "iconAlignmentH": "flex-start",
+        "iconAlignmentV": "flex-end",
+        "iconOffsetX": 0,
+        "iconOffsetY": -24
+      },
+      "phone": {
+        "enabled": true,
+        "height": 160,
+        "viewOffset": 0,
+        "noteOffset": -32,
+        "borderRadius": [
+          8,
+          8,
+          8,
+          8
+        ],
+        "padding": 8,
+        "fade": true,
+        "iconEnabled": false,
+        "iconSize": 56,
+        "iconRadius": 8,
+        "iconBackground": true,
+        "iconBorder": 2,
+        "iconFrame": true,
+        "iconAlignmentH": "flex-start",
+        "iconAlignmentV": "flex-end",
+        "iconOffsetX": 0,
+        "iconOffsetY": -24
+      }
+    },
+    "supportedExtensions": [
+      "md",
+      "mdx"
+    ],
+    "debugMode": false
+  },
+  "homeBase": {
+    "homeBaseType": "File",
+    "homeBaseValue": "_bases/Home.base",
+    "openOnStartup": true,
+    "openViewMode": "default",
+    "openMode": "replace-all",
+    "manualOpenMode": "retain",
+    "replaceNewTab": false,
+    "newTabMode": "only-when-empty",
+    "openWhenAllTabsClosed": false,
+    "useDifferentFileForNewTab": false,
+    "newTabType": "File",
+    "newTabValue": "",
+    "newTabSeparateMobile": false,
+    "mobileNewTabType": "File",
+    "mobileNewTabValue": "",
+    "showStickyHomeIcon": true,
+    "stickyIconName": "home",
+    "hideHomeTabHeader": true,
+    "replaceMobileNewTab": false,
+    "separateMobile": false,
+    "mobileHomeBaseType": "File",
+    "mobileHomeBaseValue": "",
+    "commandOnOpen": "",
+    "waitForGitSync": false,
+    "gitSyncTimeout": 3,
+    "revertView": false,
+    "autoScroll": false,
+    "hideReleaseNotes": false,
+    "stickyIconReplaceTab": false
+  },
+  "explorerFocus": {},
+  "ignoreConfig": {
+    "gitIgnoreConfigured": false,
+    "viteIgnoreConfigured": false
+  },
+  "gitConfig": {
+    "enabled": false,
+    "isPrivate": false,
+    "branchName": "main",
+    "autoConfigureObsidianGit": false
+  },
+  "runWizardOnStartup": false,
+  "wizardCompleted": true,
+  "enableMdxSupport": false
+}

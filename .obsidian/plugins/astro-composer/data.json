@@ -1,0 +1,46 @@
+{
+  "defaultTemplate": "---\ntitle: \"{{title}}\"\ndate: {{date}}\ntarget_level: Medium\nroaster: Behmor 2000 AB Plus\nbatch_size_g: 227\nprofile: P1\nweight_setting: ½ lb\ntags:\n  - roast\ndraft: true\n---\n\n# Bean notes\n\n# Playbook\n\n# Interventions\n\n# Anything weird\n\n# Tasting notes\n\n# Next time\n",
+  "autoInsertProperties": true,
+  "dateFormat": "YYYY-MM-DD",
+  "enableCopyHeadingLink": true,
+  "copyHeadingLinkFormat": "astro",
+  "addTrailingSlashToLinks": true,
+  "enableOpenTerminalCommand": true,
+  "terminalProjectRootPath": "../../",
+  "terminalApplicationName": "",
+  "enableTerminalDebugLogging": false,
+  "enableTerminalRibbonIcon": true,
+  "enableOpenConfigFileCommand": true,
+  "configFilePath": "../../astro.config.mjs",
+  "enableConfigRibbonIcon": true,
+  "contentTypes": [
+    {
+      "id": "content-type-roast",
+      "name": "Roasts",
+      "folder": "src/content/roasts",
+      "linkBasePath": "/roasts/",
+      "template": "---\ntitle: \"{{title}}\"\ndate: {{date}}\ntarget_level: Medium\nroaster: Behmor 2000 AB Plus\nbatch_size_g: 227\nprofile: P1\nweight_setting: ½ lb\ntags:\n  - roast\ndraft: true\n---\n\n# Bean notes\n\n# Playbook\n\n# Interventions\n\n# Anything weird\n\n# Tasting notes\n\n# Next time\n",
+      "enabled": true,
+      "creationMode": "file",
+      "indexFileName": "index",
+      "ignoreSubfolders": false,
+      "enableUnderscorePrefix": true
+    }
+  ],
+  "migrationCompleted": true,
+  "helpButtonReplacement": {
+    "enabled": true,
+    "commandId": "astro-composer:edit-astro-config",
+    "iconId": "rocket"
+  },
+  "showMdxFilesInExplorer": false,
+  "processBackgroundFileChanges": true,
+  "syncDraftDate": false,
+  "draftDetectionMode": "property",
+  "draftProperty": "draft",
+  "draftLogic": "true-is-draft",
+  "publishDateField": "date",
+  "renameOnTitleClick": false,
+  "updateModifiedDate": false,
+  "modifiedDateField": ""
+}

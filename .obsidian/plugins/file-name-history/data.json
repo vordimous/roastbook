@@ -1,0 +1,18 @@
+{
+  "historyPropertyName": "history",
+  "ignoreRegexes": [
+    "^_",
+    "^Untitled$",
+    "^Untitled \\d+$"
+  ],
+  "timeoutSeconds": 5,
+  "caseSensitive": false,
+  "autoCreateFrontmatter": true,
+  "includeFolders": [],
+  "excludeFolders": [],
+  "fileExtensions": [
+    "md"
+  ],
+  "trackFolderRenames": "",
+  "excludePropertyName": ""
+}
