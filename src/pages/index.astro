@@ -1,0 +1,28 @@
+---
+import { getCollection } from "astro:content";
+
+const roasts = await getCollection("roasts");
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>roastbook-spike</title>
+  </head>
+  <body>
+    <h1>roastbook-spike</h1>
+    <p>
+      Minimal scaffold. Purpose: validate astro-editor against the intended
+      Zod schema. See <code>spike-findings.md</code>.
+    </p>
+    <ul>
+      {
+        roasts.map((r) => (
+          <li>
+            <strong>{r.id}</strong> — {r.data.title} ({r.data.target_level})
+          </li>
+        ))
+      }
+    </ul>
+  </body>
+</html>
