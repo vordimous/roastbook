@@ -54,8 +54,21 @@ Open `./src/content/` as an Obsidian vault. Edit the same file.
 Based on the above, mark one:
 
 - [ ] **Keep `playbook` and `interventions` in frontmatter.** astro-editor rendered them as usable multi-line textareas. Phase 1 schema = this spike's schema.
-- [ ] **Move `playbook` and `interventions` to the markdown body** using HTML-comment section markers (e.g. `<!-- playbook -->`). Reason: astro-editor rendered them as single-line / unusable, OR rewrote the YAML block scalar lossily. Phase 1 schema strips these fields.
+- [x] **Move `playbook` and `interventions` to the markdown body** under H1 section dividers (`# Playbook`, `# Interventions`, etc.). Reason: astro-editor rendered every multi-line frontmatter string as a single-line input, collapsing newlines (the 30-line B-temp interventions log became `237237244255264275280289296303Dp4...`). Phase 1 schema strips long-form fields from frontmatter; the renderer in Phase 2 splits body markdown by H1 to slot sections into the layout.
 - [ ] **Hybrid.** Keep short multi-line fields (`bean_notes`, `why_dropped`, `next_time`) in frontmatter as a scalar; move the long structured ones (`playbook`, `interventions`) to the body. Document the convention.
+
+### Fields moved from frontmatter to body (under H1 headings)
+
+- `# Bean notes`
+- `# Playbook` (required — contains the action-driving steps; validated by a lint script in Phase 1)
+- `# Interventions`
+- `# Anything weird`
+- `# Tasting notes`
+- `# Next time`
+
+### Fields kept in frontmatter (all scalar, astro-editor handles cleanly)
+
+Title, date, origin, process, product_url, vendor, target_level, tags, batch_size_g, profile, weight_setting, green_weight_g, ambient_f, ambient_rh, time_to_fc, color_at_fc, smell_at_fc, total_time, why_dropped, roasted_weight_g, roasted_photo, rating, roaster, draft.
 
 ## Other surprises
 
