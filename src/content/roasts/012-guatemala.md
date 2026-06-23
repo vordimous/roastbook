@@ -17,10 +17,10 @@ weight_setting: ½ lb
 green_weight_g: 227
 ambient_f: 82
 ambient_rh: 71
-time_to_fc: "9:41"
+time_to_fc: 9:41
 color_at_fc: light brown
 smell_at_fc: popcorn
-total_time: "13:10"
+total_time: 13:10
 why_dropped: smell
 roasted_weight_g: 193.6
 roaster: Behmor 2000 AB Plus
