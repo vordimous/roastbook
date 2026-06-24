@@ -1,54 +1,52 @@
 filters:
   and:
     - file.ext == "md"
-
 properties:
-  "file.fullname":
+  file.fullname:
     displayName: Full File Name
-  "file.name":
+  file.name:
     displayName: File Name
-  "note.title":
+  note.title:
     displayName: Title
-  "note.date":
+  note.date:
     displayName: Date
-  "note.target_level":
+  note.target_level:
     displayName: Target
-  "note.origin":
+  note.origin:
     displayName: Origin
-  "note.roaster":
+  note.roaster:
     displayName: Roaster
-  "note.green_weight_g":
+  note.green_weight_g:
     displayName: Green (g)
-  "note.roasted_weight_g":
+  note.roasted_weight_g:
     displayName: Roasted (g)
-  "note.time_to_fc":
+  note.time_to_fc:
     displayName: FC
-  "note.total_time":
+  note.total_time:
     displayName: Total
-  "note.rating":
+  note.rating:
     displayName: Rating
-  "note.tags":
+  note.tags:
     displayName: Tags
-  "note.draft":
+  note.draft:
     displayName: Draft
-
 views:
   - type: cms
-    name: "Roasts"
+    name: Roasts
     filters:
       and:
         - file.folder.startsWith("src/content/roasts")
     sort:
-      - property: note.date
+      - property: date
         direction: DESC
-    imageFormat: "none"
+    imageFormat: none
     showDate: true
     customizeNewButton: true
-    newNoteLocation: "src/content/roasts"
-    fallbackToEmbeds: "if-empty"
+    newNoteLocation: src/content/roasts
+    fallbackToEmbeds: if-empty
     propertyDisplay1: file.fullname
     showTextPreview: true
-    propertyLabels: "above"
+    propertyLabels: above
     titleProperty: note.title
     dateProperty: note.date
     descriptionProperty: note.origin
@@ -58,7 +56,7 @@ views:
     draftStatusUseFilenamePrefix: false
     draftStatusProperty: note.draft
   - type: cms
-    name: "Vault CMS Guide"
+    name: Vault CMS Guide
     filters:
       and:
         - file.folder == "/"
@@ -67,13 +65,13 @@ views:
     sort:
       - property: file.ctime
         direction: DESC
-    fallbackToEmbeds: "never"
+    fallbackToEmbeds: never
     propertyDisplay1: file.fullname
     showTextPreview: true
-    imageFormat: "none"
+    imageFormat: none
     showDate: false
     showDraftStatus: false
-    propertyLabels: "above"
+    propertyLabels: above
     titleProperty: note.title
     propertyLayout12SideBySide: false
     propertyLayout34SideBySide: false

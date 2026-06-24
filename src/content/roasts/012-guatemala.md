@@ -1,9 +1,9 @@
 ---
-title: "012 — Guatemala Huehuetenango Rolando Sanchez (Pure Manual, real-FC timing)"
+title: 012 — Guatemala Huehuetenango Rolando Sanchez (Pure Manual, real-FC timing)
 date: 2026-06-22T00:00:00.000Z
-origin: "Guatemala — Huehuetenango, Finca Claima (Rolando Sanchez)"
+origin: Guatemala — Huehuetenango, Finca Claima (Rolando Sanchez)
 process: Wet Process (Washed)
-product_url: "https://thecaptainscoffee.com/products/guatemala-huehuetenango-rolando-sanchez"
+product_url: https://thecaptainscoffee.com/products/guatemala-huehuetenango-rolando-sanchez
 vendor: The Captain's Coffee
 target_level: Medium-Dark
 tags:
@@ -136,3 +136,4 @@ p3
 # Tasting notes
 
 # Next time
+asdfasdf

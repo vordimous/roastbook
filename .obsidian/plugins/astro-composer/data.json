@@ -1,6 +1,6 @@
 {
   "defaultTemplate": "---\ntitle: \"{{title}}\"\ndate: {{date}}\ntarget_level: Medium\nroaster: Behmor 2000 AB Plus\nbatch_size_g: 227\nprofile: P1\nweight_setting: ½ lb\ntags:\n  - roast\ndraft: true\n---\n\n# Bean notes\n\n# Playbook\n\n# Interventions\n\n# Anything weird\n\n# Tasting notes\n\n# Next time\n",
-  "autoInsertProperties": true,
+  "autoInsertProperties": false,
   "dateFormat": "YYYY-MM-DD",
   "enableCopyHeadingLink": true,
   "copyHeadingLinkFormat": "astro",

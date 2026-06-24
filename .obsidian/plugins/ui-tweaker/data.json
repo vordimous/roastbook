@@ -32,7 +32,7 @@
   "propertiesInReadingView": false,
   "propertiesInHeading": false,
   "addPropertyButton": false,
-  "deemphasizeProperties": false,
+  "deemphasizeProperties": true,
   "instructions": false,
   "mobileChevronsIcon": false,
   "navigateBackButton": false,
