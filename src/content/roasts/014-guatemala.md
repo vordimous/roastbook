@@ -99,7 +99,7 @@ total_time: 14:20
 why_dropped: color, smell, time. A nice dark chocolate brown color. slight cocoa smell. and the timing was  close to 20% after FC
 anything_weird: ''
 roasted_weight_g: 196.5
-roasted_photo: null
+roasted_photo: /media/2026-06-2715.49.361705618399256338222.jpg
 rating: null
 tasting_notes: ''
 next_time: ''
