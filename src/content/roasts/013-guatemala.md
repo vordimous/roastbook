@@ -103,7 +103,7 @@ total_time: 17:50
 why_dropped: Color, time, it felt like it had been to long
 anything_weird: ''
 roasted_weight_g: 196.4
-roasted_photo: null
+roasted_photo: /media/2026-06-2715.47.412634806387466434011.jpg
 rating: null
 tasting_notes: ''
 next_time: ''
