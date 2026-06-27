@@ -334,13 +334,16 @@ function orderKeys(field: SveltiaField): SveltiaField {
 
 export function buildConfig(collections: Record<string, any>) {
   return {
-    // A Git backend block is required even for local editing.
-    //   Tier 0 (local editing): Chromium "Work with Local Repository" reads the
-    //     working tree directly — this placeholder repo never has to exist.
-    //   Tier 1 (hosted /admin): set `repo` to "owner/name" + the right `branch`,
-    //     and add `base_url: "https://<your-oauth-worker>"` (the Cloudflare Worker
-    //     OAuth relay). Then re-run `pnpm sveltia:emit`. Full steps in DEPLOY.md.
-    backend: { name: "github", repo: "OWNER/REPO", branch: "main" },
+    // Git backend. Editing works three ways against this block (see DEPLOY.md):
+    //   Tier 0 (local): Chromium "Work with Local Repository" reads the working
+    //     tree directly — repo/branch are ignored.
+    //   Tier 1a (hosted, PAT): the /admin "Sign In with Token" option needs only
+    //     name + repo + branch — no OAuth app, no Worker, no secret in the repo.
+    //     The editor pastes a GitHub personal access token, stored in their browser.
+    //   Tier 1b (hosted, OAuth): add `base_url: "https://<oauth-worker>"` for the
+    //     one-click "Sign in with GitHub" button (Cloudflare Worker relay).
+    // Forks: change `repo`/`branch` to your own and re-run `pnpm sveltia:emit`.
+    backend: { name: "github", repo: "vordimous/roastbook", branch: "master" },
     // Global fallback for the asset library; collections with image fields
     // override this with co-located media (see collectionFromAstro).
     media_folder: "public/media",

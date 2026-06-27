@@ -1,0 +1,83 @@
+/* Roastbook — design tokens. Drop into the SSG's stylesheet.
+   Dark is the default; [data-theme="light"] on <html> flips to the paper theme.
+   Toggle in JS: document.documentElement.dataset.theme = 'light' | 'dark'
+   Persist to localStorage and honor prefers-color-scheme on first load. */
+
+:root,
+:root[data-theme="dark"] {
+  --ink:        #15130F;
+  --surface:    #1E1B16;
+  --surface-2:  #1A1712;
+  --line:       #322C22;
+  --line-soft:  #262219;
+  --hair:       #1d1a15;
+  --text:       #ECE6DA;
+  --muted:      #A39A88;
+  --dim:        #6E665A;
+  --accent:     #DD6B33;       /* burnt orange */
+  --row-hover:  #1A1712;
+  --card-shadow: 0 1px 3px rgba(0,0,0,.2);
+
+  /* status dots */
+  --dot-ready:        #ECE6DA;
+  --dot-resting-ring: #8A8073;
+  --dot-past-ring:    #5A5247;
+}
+
+:root[data-theme="light"] {
+  --ink:        #ECE7DC;
+  --surface:    #F4F0E6;
+  --surface-2:  #F0EBDF;
+  --line:       #D8D1C2;
+  --line-soft:  #DDD6C7;
+  --hair:       #E2DBCC;
+  --text:       #2A2620;
+  --muted:      #6E665A;
+  --dim:        #9A917F;
+  --accent:     #B5511F;       /* darkened burnt orange for paper contrast */
+  --row-hover:  #E7E0D2;
+  --card-shadow: 0 1px 3px rgba(0,0,0,.12);
+
+  --dot-ready:        #5A5247;
+  --dot-resting-ring: #9A917F;
+  --dot-past-ring:    #C2BAA8;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) { /* mirror the light block when no explicit choice */
+    --ink: #ECE7DC; --surface: #F4F0E6; --surface-2: #F0EBDF;
+    --line: #D8D1C2; --line-soft: #DDD6C7; --hair: #E2DBCC;
+    --text: #2A2620; --muted: #6E665A; --dim: #9A917F; --accent: #B5511F;
+    --row-hover: #E7E0D2; --card-shadow: 0 1px 3px rgba(0,0,0,.12);
+    --dot-ready: #5A5247; --dot-resting-ring: #9A917F; --dot-past-ring: #C2BAA8;
+  }
+}
+
+/* Roast-level scale — DATA KEY ONLY (swatches, phase bars). Never UI chrome. */
+:root {
+  --level-light:       #C9A36B;
+  --level-med-light:   #B07D43;
+  --level-medium:      #8A5A2B;
+  --level-med-dark:    #5E3A1E;
+  --level-dark:        #3A2415;
+}
+
+/* Type roles */
+:root {
+  --font-serif: 'IBM Plex Serif', Georgia, serif;
+  --font-sans:  'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:  'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* Shared primitives */
+body { background: var(--ink); color: var(--text); font-family: var(--font-sans); }
+
+.section-label {           /* the mono uppercase micro-labels */
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.metric { font-family: var(--font-mono); color: var(--text); }  /* all numbers */

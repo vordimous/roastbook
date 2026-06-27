@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  a { text-decoration:none; color:inherit; }
+</style>
+</helmet>
+
+<div style="position:absolute; left:80px; top:64px; font-family:'IBM Plex Serif',serif; font-size:26px; font-weight:600; color:#2A2620;">Roastbook<span style="color:#B5511F;">.</span> <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:400; color:#6E665A; letter-spacing:0.04em;">— warm-dark lab notebook · one system, every page</span></div>
+
+<!-- POST-IT -->
+<div style="position:absolute; left:2000px; top:150px; width:300px; background:#F3E8B0; padding:16px 18px; font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; line-height:1.55; color:#3a3520; box-shadow:0 2px 10px rgba(0,0,0,.14); transform:rotate(-1.2deg);">
+  <div style="font-weight:700; margin-bottom:6px;">The direction</div>
+  Warm but <b>not coffee-brown</b> — a near-black warm ink with one burnt-orange signal accent. The only browns are the <b>roast-level scale</b>, used purely as a data key.<br><br>
+  <b>Numbers stand out</b> via monospace + an instrument-readout row. <b>Status</b> stays subtle (mono label + a quiet dot, no color).<br><br>
+  Dark is primary; the light frame (bottom-left) is the same tokens flipped — a <b>theme switch</b> drops straight in.
+</div>
+
+<!-- ============ FRAME 1: SYSTEM KEY ============ -->
+<div style="position:absolute; left:80px; top:150px; width:840px;">
+  <div data-drags-parent="1" style="position:absolute; top:-22px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A; letter-spacing:0.08em;">SYSTEM KEY</div>
+  <div style="background:#15130F; border:1px solid #322C22; border-radius:8px; padding:26px 28px; color:#ECE6DA; font-family:'IBM Plex Sans',sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.2);">
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">PALETTE — WARM DARK</div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1;"><div style="height:42px; border-radius:4px; background:#15130F; border:1px solid #322C22;"></div><div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#6E665A; margin-top:5px;">ink</div></div>
+          <div style="flex:1;"><div style="height:42px; border-radius:4px; background:#1E1B16; border:1px solid #322C22;"></div><div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#6E665A; margin-top:5px;">surface</div></div>
+          <div style="flex:1;"><div style="height:42px; border-radius:4px; background:#ECE6DA;"></div><div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#6E665A; margin-top:5px;">paper</div></div>
+          <div style="flex:1;"><div style="height:42px; border-radius:4px; background:#DD6B33;"></div><div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#6E665A; margin-top:5px;">burnt</div></div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin:20px 0 12px;">STATUS — SUBTLE, NO COLOR</div>
+        <div style="display:flex; gap:18px; align-items:center;">
+          <span style="display:flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#A39A88;"><span style="width:6px;height:6px;border-radius:50%;background:#ECE6DA;"></span>ready</span>
+          <span style="display:flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#A39A88;"><span style="width:6px;height:6px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1px #8A8073;"></span>resting</span>
+          <span style="display:flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#6E665A;"><span style="width:6px;height:6px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1px #5A5247;"></span>past-peak</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">TYPE — IBM PLEX TRIO</div>
+        <div style="font-family:'IBM Plex Serif',serif; font-size:24px; font-weight:600; line-height:1.1;">Serif headings</div>
+        <div style="font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:#A39A88; margin-top:6px; line-height:1.45;">Sans body — the prose and notes you read while dialing in a roast.</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; color:#DD6B33; margin-top:10px; letter-spacing:0.02em;">10:51 · 22.5% · 196.9g</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#6E665A; margin-top:2px;">mono for every measurement</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; padding-top:20px; border-top:1px solid #262219;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">ROAST LEVEL — THE ONLY BROWNS, A DATA KEY</div>
+      <div style="display:flex; gap:10px;">
+        <sc-for list="{{ levelScale }}" as="lv" hint-placeholder-count="5">
+          <div style="flex:1; text-align:center;">
+            <div style="{{ lv.bar }}"></div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#A39A88; margin-top:6px;">{{ lv.name }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FRAME 2: INDEX (DARK) ============ -->
+<div style="position:absolute; left:80px; top:640px; width:840px;">
+  <div data-drags-parent="1" style="position:absolute; top:-22px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A; letter-spacing:0.08em;">INDEX — ROAST LOG (DARK)</div>
+  <div style="background:#15130F; border:1px solid #322C22; border-radius:8px; color:#ECE6DA; font-family:'IBM Plex Sans',sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.2); overflow:hidden;">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 26px; border-bottom:1px solid #262219;">
+      <div style="font-family:'IBM Plex Serif',serif; font-size:20px; font-weight:600;">Roastbook<span style="color:#DD6B33;">.</span></div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#6E665A;">THEME</span>
+        <div style="display:flex; border:1px solid #322C22; border-radius:999px; overflow:hidden;">
+          <span style="padding:4px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; background:#DD6B33; color:#15130F;">dark</span>
+          <span style="padding:4px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A;">light</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px 26px 28px;">
+      <div style="font-family:'IBM Plex Serif',serif; font-size:30px; font-weight:600; line-height:1.05; margin-bottom:10px;">Roast Log</div>
+      <div style="font-size:13.5px; line-height:1.5; color:#A39A88; max-width:560px;">Running log of home coffee roasts — what I dialed in, what happened in the drum, and how the cup turned out. Click a roast for the full plan, measurements, and notes.</div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:20px;">
+        <sc-for list="{{ refs }}" as="rf" hint-placeholder-count="4">
+          <a style="display:block; border:1px solid #262219; border-radius:6px; padding:11px 14px; transition:border-color .15s;" style-hover="border-color:#4a4234;">
+            <div style="display:flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:#ECE6DA;"><span style="color:#DD6B33;">→</span>{{ rf.t }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E665A; margin-top:3px; margin-left:14px;">{{ rf.s }}</div>
+          </a>
+        </sc-for>
+      </div>
+
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin:28px 0 8px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A;">ROAST LOG</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E665A;">7 entries</div>
+      </div>
+      <div style="display:grid; grid-template-columns:34px 1fr 84px 56px 96px 64px 60px; gap:10px; padding:0 4px 8px; border-bottom:1px solid #262219; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#6E665A;">
+        <div>#</div><div>ORIGIN</div><div>STATUS</div><div>DATE</div><div>LEVEL</div><div style="text-align:right;">LOSS</div><div style="text-align:right;">DTR</div>
+      </div>
+      <sc-for list="{{ roasts }}" as="r" hint-placeholder-count="7">
+        <a style="display:grid; grid-template-columns:34px 1fr 84px 56px 96px 64px 60px; gap:10px; align-items:center; padding:13px 4px; border-bottom:1px solid #1d1a15; transition:background .12s;" style-hover="background:#1A1712;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#DD6B33; font-weight:500;">{{ r.num }}</div>
+          <div>
+            <div style="font-size:13.5px; font-weight:500; color:#ECE6DA; line-height:1.25;">{{ r.name }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#6E665A; margin-top:2px;">{{ r.sub }}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#A39A88;"><span style="{{ r.dotStyle }}"></span>{{ r.status }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#A39A88;">{{ r.date }}</div>
+          <div style="display:flex; align-items:center; gap:7px;"><span style="{{ r.swatchStyle }}"></span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#A39A88;">{{ r.level }}</span></div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:right; color:#ECE6DA;">{{ r.loss }}%</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:right; color:#ECE6DA;">{{ r.dtr }}%</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FRAME 3: DETAIL (DARK) ============ -->
+<div style="position:absolute; left:1000px; top:150px; width:880px;">
+  <div data-drags-parent="1" style="position:absolute; top:-22px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A; letter-spacing:0.08em;">ROAST DETAIL (DARK)</div>
+  <div style="background:#15130F; border:1px solid #322C22; border-radius:8px; color:#ECE6DA; font-family:'IBM Plex Sans',sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.2); overflow:hidden;">
+    <div style="padding:26px 30px 30px;">
+
+      <a style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#DD6B33;">← all roasts</a>
+      <div style="font-family:'IBM Plex Serif',serif; font-size:27px; font-weight:600; line-height:1.12; margin-top:14px;">015 — Nicaragua El Quetzal Estate Java <span style="color:#A39A88; font-weight:500;">(Washed)</span></div>
+      <div style="display:flex; align-items:center; gap:10px; margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#A39A88;">
+        <span>2026-06-27</span><span style="color:#4a4234;">·</span>
+        <span style="display:flex; align-items:center; gap:6px;"><span style="width:11px;height:11px;border-radius:2px;background:#8A5A2B;"></span>Medium</span><span style="color:#4a4234;">·</span>
+        <span>Behmor 2000 AB Plus</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:#262219; border:1px solid #262219; border-radius:8px; overflow:hidden; margin-top:22px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="5">
+          <div style="background:#1A1712; padding:16px 14px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.1em; color:#6E665A;">{{ s.l }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:500; color:#ECE6DA; margin-top:5px;">{{ s.v }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; padding:13px 16px; border:1px solid #262219; border-radius:8px;">
+        <div style="display:flex; align-items:center; gap:9px;"><span style="width:6px;height:6px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1px #8A8073;"></span><span style="font-size:13px; color:#A39A88;">Resting — ready to drink</span></div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#DD6B33;">Jun 28 – Jul 7</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:26px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">ROAST PLAN</div>
+          <sc-for list="{{ planRows }}" as="p" hint-placeholder-count="8">
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #1d1a15;">
+              <div style="font-size:12.5px; color:#6E665A; flex:0 0 auto;">{{ p.k }}</div>
+              <div style="font-size:12.5px; color:#ECE6DA; text-align:right;">{{ p.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">TARGETS — MEDIUM</div>
+          <sc-for list="{{ targetRows }}" as="t" hint-placeholder-count="4">
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #1d1a15;">
+              <div style="font-size:12.5px; color:#6E665A; flex:0 0 auto;">{{ t.k }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#ECE6DA; text-align:right;">{{ t.v }}</div>
+            </div>
+          </sc-for>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin:18px 0 12px;">MEASURED</div>
+          <sc-for list="{{ measuredRows }}" as="m" hint-placeholder-count="4">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:8px 0; border-bottom:1px solid #1d1a15;">
+              <div style="font-size:12.5px; color:#6E665A;">{{ m.k }}</div>
+              <div style="display:flex; align-items:baseline; gap:8px;">
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#ECE6DA;">{{ m.v }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#DD6B33;">{{ m.d }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top:26px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A;">PHASE SPLIT vs 50 / 30 / 20</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E665A;">your roast</div>
+        </div>
+        <div style="position:relative; display:flex; height:30px; border-radius:5px; overflow:hidden; background:#1A1712;">
+          <div style="width:51.2%; background:#C9A36B;"></div>
+          <div style="width:26.3%; background:#8A5A2B;"></div>
+          <div style="width:22.5%; background:#DD6B33;"></div>
+          <div style="position:absolute; left:50%; top:-3px; bottom:-3px; width:1.5px; background:#ECE6DA; opacity:.55;"></div>
+          <div style="position:absolute; left:80%; top:-3px; bottom:-3px; width:1.5px; background:#ECE6DA; opacity:.55;"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px;">
+          <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex; align-items:center; gap:7px;"><span style="{{ ph.swatch }}"></span><span style="font-size:12px; color:#ECE6DA;">{{ ph.name }}</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#A39A88; margin-top:5px;">{{ ph.time }} · {{ ph.pct }}%</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#6E665A; margin-top:2px;">{{ ph.delta }} pt vs target</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top:26px; border:1px solid #262219; border-radius:8px; padding:18px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A;">BEAN TEMP — BUTTON LOG</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E665A;">°F / 30s</div>
+        </div>
+        <svg viewBox="0 0 340 96" width="100%" height="130" preserveAspectRatio="none" style="display:block; overflow:visible;">
+          <polyline points="{{ tempArea }}" fill="#DD6B33" fill-opacity="0.08" stroke="none"></polyline>
+          <polyline points="{{ tempPoints }}" fill="none" stroke="#DD6B33" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          <circle cx="{{ fcX }}" cy="{{ fcY }}" r="3" fill="#15130F" stroke="#DD6B33" stroke-width="1.6"></circle>
+        </svg>
+        <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#6E665A; margin-top:8px;">
+          <span>charge 183°F</span><span style="color:#A39A88;">● FC ~294°F @ 10:51</span><span>drop 276°F</span>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:26px; margin-top:26px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">EXPECTED TIMING</div>
+          <sc-for list="{{ timing }}" as="tm" hint-placeholder-count="3">
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #1d1a15;">
+              <div style="font-size:12.5px; color:#A39A88;">{{ tm.k }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#ECE6DA;">{{ tm.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#6E665A; margin-bottom:12px;">LIVE NOTES</div>
+          <sc-for list="{{ notes }}" as="n" hint-placeholder-count="3">
+            <div style="display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #1d1a15;">
+              <div style="font-size:12.5px; color:#6E665A;">{{ n.k }}</div>
+              <div style="font-size:12.5px; color:#ECE6DA; text-align:right;">{{ n.v }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ FRAME 4: INDEX (LIGHT) ============ -->
+<div style="position:absolute; left:80px; top:1480px; width:840px;">
+  <div data-drags-parent="1" style="position:absolute; top:-22px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A; letter-spacing:0.08em;">INDEX — SAME TOKENS, LIGHT THEME</div>
+  <div style="background:#ECE7DC; border:1px solid #D8D1C2; border-radius:8px; color:#2A2620; font-family:'IBM Plex Sans',sans-serif; box-shadow:0 1px 3px rgba(0,0,0,.12); overflow:hidden;">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 26px; border-bottom:1px solid #DDD6C7;">
+      <div style="font-family:'IBM Plex Serif',serif; font-size:20px; font-weight:600;">Roastbook<span style="color:#B5511F;">.</span></div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#9A917F;">THEME</span>
+        <div style="display:flex; border:1px solid #D2CABA; border-radius:999px; overflow:hidden;">
+          <span style="padding:4px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#9A917F;">dark</span>
+          <span style="padding:4px 10px; font-family:'IBM Plex Mono',monospace; font-size:11px; background:#B5511F; color:#ECE7DC;">light</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px 26px 28px;">
+      <div style="font-family:'IBM Plex Serif',serif; font-size:30px; font-weight:600; line-height:1.05; margin-bottom:10px;">Roast Log</div>
+      <div style="font-size:13.5px; line-height:1.5; color:#6E665A; max-width:560px;">Running log of home coffee roasts — what I dialed in, what happened in the drum, and how the cup turned out.</div>
+
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin:24px 0 8px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.12em; color:#9A917F;">ROAST LOG</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#9A917F;">7 entries</div>
+      </div>
+      <div style="display:grid; grid-template-columns:34px 1fr 84px 56px 96px 64px 60px; gap:10px; padding:0 4px 8px; border-bottom:1px solid #D8D1C2; font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:0.08em; color:#9A917F;">
+        <div>#</div><div>ORIGIN</div><div>STATUS</div><div>DATE</div><div>LEVEL</div><div style="text-align:right;">LOSS</div><div style="text-align:right;">DTR</div>
+      </div>
+      <sc-for list="{{ roastsLight }}" as="r" hint-placeholder-count="7">
+        <div style="display:grid; grid-template-columns:34px 1fr 84px 56px 96px 64px 60px; gap:10px; align-items:center; padding:13px 4px; border-bottom:1px solid #E2DBCC;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#B5511F; font-weight:500;">{{ r.num }}</div>
+          <div>
+            <div style="font-size:13.5px; font-weight:500; color:#2A2620; line-height:1.25;">{{ r.name }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#9A917F; margin-top:2px;">{{ r.sub }}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:7px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A;"><span style="{{ r.dotStyle }}"></span>{{ r.status }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#6E665A;">{{ r.date }}</div>
+          <div style="display:flex; align-items:center; gap:7px;"><span style="{{ r.swatchStyle }}"></span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E665A;">{{ r.level }}</span></div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:right; color:#2A2620;">{{ r.loss }}%</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; text-align:right; color:#2A2620;">{{ r.dtr }}%</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const lvl = { 'Light':'#C9A36B', 'Medium-Light':'#B07D43', 'Medium':'#8A5A2B', 'Medium-Dark':'#5E3A1E', 'Dark':'#3A2415' };
+
+    const dotDark = (s) => {
+      const base = { width:'6px', height:'6px', borderRadius:'50%', display:'inline-block', flex:'0 0 auto' };
+      if (s === 'ready') return { ...base, background:'#ECE6DA' };
+      if (s === 'resting') return { ...base, background:'transparent', boxShadow:'inset 0 0 0 1px #8A8073' };
+      return { ...base, background:'transparent', boxShadow:'inset 0 0 0 1px #5A5247' };
+    };
+    const dotLight = (s) => {
+      const base = { width:'6px', height:'6px', borderRadius:'50%', display:'inline-block', flex:'0 0 auto' };
+      if (s === 'ready') return { ...base, background:'#5A5247' };
+      if (s === 'resting') return { ...base, background:'transparent', boxShadow:'inset 0 0 0 1px #9A917F' };
+      return { ...base, background:'transparent', boxShadow:'inset 0 0 0 1px #C2BAA8' };
+    };
+    const swatch = (lv) => ({ width:'12px', height:'12px', borderRadius:'2px', background:lvl[lv], flex:'0 0 auto' });
+
+    const data = [
+      { num:'015', name:'Nicaragua El Quetzal Estate Java', sub:'Washed · El Quetzal', status:'resting', date:'06-27', level:'Medium', loss:'13.3', dtr:'22.5' },
+      { num:'014', name:'Guatemala Huehuetenango', sub:'Rolando Sanchez', status:'resting', date:'06-27', level:'Medium', loss:'13.4', dtr:'23.8' },
+      { num:'013', name:'Guatemala Huehuetenango', sub:'Rolando Sanchez', status:'resting', date:'06-27', level:'Medium', loss:'13.5', dtr:'16.4' },
+      { num:'011', name:'Guatemala Huehuetenango', sub:'Rolando Sanchez', status:'ready', date:'06-22', level:'Medium-Dark', loss:'14.4', dtr:'35.2' },
+      { num:'012', name:'Guatemala Huehuetenango', sub:'Rolando Sanchez', status:'past-peak', date:'06-22', level:'Medium-Dark', loss:'14.7', dtr:'26.5' },
+      { num:'010', name:'Guatemala Huehuetenango', sub:'Full City+, pushed longer', status:'ready', date:'06-21', level:'Medium-Dark', loss:'9.8', dtr:'38.4' },
+      { num:'009', name:'Guatemala Huehuetenango', sub:'Full City+', status:'ready', date:'06-20', level:'Medium-Dark', loss:'7.9', dtr:'39.6' },
+    ];
+    const roasts = data.map(r => ({ ...r, dotStyle: dotDark(r.status), swatchStyle: swatch(r.level) }));
+    const roastsLight = data.map(r => ({ ...r, dotStyle: dotLight(r.status), swatchStyle: swatch(r.level) }));
+
+    const levelScale = [
+      { name:'Light', c:'#C9A36B' }, { name:'Med-Light', c:'#B07D43' }, { name:'Medium', c:'#8A5A2B', active:true },
+      { name:'Med-Dark', c:'#5E3A1E' }, { name:'Dark', c:'#3A2415' },
+    ].map(l => ({ name:l.name, bar: { height:'34px', borderRadius:'4px', background:l.c, boxShadow: l.active ? 'inset 0 0 0 2px #DD6B33' : 'none' } }));
+
+    const refs = [
+      { t:'Methods & reference', s:'how the numbers are computed' },
+      { t:'Behmor 2000 AB Plus', s:'drum-roaster cheat sheet' },
+      { t:'Poppo (air popper)', s:'observed baselines' },
+      { t:'Behmor video notes', s:'community technique' },
+    ];
+
+    const stats = [ {l:'FC',v:'10:51'}, {l:'TOTAL',v:'14:00'}, {l:'DEV',v:'3:09'}, {l:'DTR',v:'22.5%'}, {l:'LOSS',v:'13.3%'} ];
+
+    const planRows = [
+      {k:'Origin', v:'Nicaragua — Matagalpa'}, {k:'Process', v:'Washed'}, {k:'Target', v:'Medium'},
+      {k:'Roaster', v:'Behmor 2000 AB Plus'}, {k:'Profile', v:'P5'}, {k:'Batch', v:'227 g'},
+      {k:'Green weight', v:'227 g'}, {k:'Conditions', v:'80°F / 78% RH'},
+    ];
+    const targetRows = [
+      {k:'Weight loss', v:'14–16%'}, {k:'DTR', v:'18–22%'},
+      {k:'Drop', v:'end FC +1:30–2:30'}, {k:'Flavor', v:'caramel / cocoa'},
+    ];
+    const measuredRows = [
+      {k:'Roasted', v:'196.9 g', d:''}, {k:'Weight loss', v:'13.3%', d:'under 0.7%'},
+      {k:'Dev time', v:'3:09', d:''}, {k:'DTR', v:'22.5%', d:'over 0.5%'},
+    ];
+
+    const phases = [
+      { name:'Drying', time:'7:10', pct:'51.2', delta:'+1.2', swatch:{ width:'9px', height:'9px', borderRadius:'2px', background:'#C9A36B' } },
+      { name:'Maillard', time:'3:41', pct:'26.3', delta:'-3.7', swatch:{ width:'9px', height:'9px', borderRadius:'2px', background:'#8A5A2B' } },
+      { name:'Development', time:'3:09', pct:'22.5', delta:'+2.5', swatch:{ width:'9px', height:'9px', borderRadius:'2px', background:'#DD6B33' } },
+    ];
+
+    const timing = [ {k:'False crack', v:'~5–7 min'}, {k:'Real FC', v:'~8–10 min'}, {k:'Real 2C', v:'~10–12 min'} ];
+    const notes = [ {k:'Color at FC', v:'medium brown'}, {k:'Smell at FC', v:'sourdough bread'}, {k:'Why dropped', v:'timing'} ];
+
+    // temp curve from button log
+    const temps = [183,187,195,212,220,235,246,258,269,278,291,287,282,280,282,282,282,284,287,289,293,294,293,287,284,276];
+    const W=340, H=96, pad=8, mn=178, mx=298;
+    const xs = (i) => pad + i/(temps.length-1)*(W-2*pad);
+    const ys = (v) => pad + (1-(v-mn)/(mx-mn))*(H-2*pad);
+    const pts = temps.map((v,i) => xs(i).toFixed(1)+','+ys(v).toFixed(1)).join(' ');
+    const tempArea = pad+','+(H-pad)+' '+pts+' '+(W-pad)+','+(H-pad);
+    const mxi = temps.indexOf(Math.max(...temps));
+    const fcX = xs(mxi).toFixed(1), fcY = ys(temps[mxi]).toFixed(1);
+
+    return { roasts, roastsLight, levelScale, refs, stats, planRows, targetRows, measuredRows, phases, timing, notes, tempPoints:pts, tempArea, fcX, fcY };
+  }
+}
+</script>
+</body>
+</html>

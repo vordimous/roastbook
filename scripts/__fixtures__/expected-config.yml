@@ -2,8 +2,8 @@
 # Source of truth: src/content.config.ts
 backend:
   name: github
-  repo: OWNER/REPO
-  branch: main
+  repo: vordimous/roastbook
+  branch: master
 media_folder: public/media
 public_folder: /media
 collections:
