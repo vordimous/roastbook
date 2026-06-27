@@ -1,8 +1,17 @@
 ---
 import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
+import { marked } from "marked";
+import Base from "../../layouts/Base.astro";
+import RoastHeadline from "../../components/RoastHeadline.astro";
+import PhaseBar from "../../components/PhaseBar.astro";
+import { computeRoastStats } from "../../lib/roastStats";
 
 export async function getStaticPaths() {
-  const roasts = await getCollection("roasts");
+  // Build draft detail pages in dev for preview, but not in prod.
+  const roasts = (await getCollection("roasts")).filter(
+    (entry) => !import.meta.env.PROD || !entry.data.draft,
+  );
   return roasts.map((entry) => ({
     params: { slug: entry.id },
     props: { entry },
@@ -12,95 +21,333 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
+
+const stats = computeRoastStats(d);
+
+// "in range" / "under by X%" / "over by X%" label for a computed value.
+const round1 = (n: number) => Math.round(Math.abs(n) * 10) / 10;
+function badgeText(
+  badge: "ok" | "under" | "over" | undefined,
+  val: number | null,
+  range?: [number, number],
+): string | null {
+  if (!badge || val == null || !range) return null;
+  if (badge === "ok") return "in range";
+  return badge === "under" ? `under by ${round1(range[0] - val)}%` : `over by ${round1(val - range[1])}%`;
+}
+const lossBadgeText = badgeText(stats.lossBadge, stats.lossPct, stats.targetLevel?.loss_pct);
+const dtrBadgeText = badgeText(stats.dtrBadge, stats.dtrPct, stats.targetLevel?.dtr_pct);
+
+// Render a long-form markdown frontmatter field to HTML (Hugo's `markdownify`).
+const md = (s?: string | null) => (s ? (marked.parse(s) as string) : "");
+
+// Source label: vendor name, else the product URL's hostname (mirrors single.html).
+const sourceLabel =
+  d.vendor ||
+  (d.product_url ? new URL(d.product_url).hostname.replace(/^www\./, "") : null);
+
+const hasMeasured =
+  d.roasted_weight_g != null ||
+  d.time_to_fc ||
+  d.total_time ||
+  d.rating != null;
+
+const hasLive =
+  d.color_at_fc ||
+  d.smell_at_fc ||
+  d.interventions ||
+  d.why_dropped ||
+  d.anything_weird;
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{d.title}</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-      body {
-        font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-        max-width: 760px;
-        margin: 2rem auto;
-        padding: 0 1.25rem;
-      }
-      h1 {
-        margin-bottom: 0.25rem;
-      }
-      .meta {
-        color: #888;
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
-      }
-      dl.frontmatter {
-        display: grid;
-        grid-template-columns: max-content 1fr;
-        gap: 0.25rem 1rem;
-        background: rgba(127, 127, 127, 0.08);
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        margin-bottom: 2rem;
-        font-size: 0.9rem;
-      }
-      dl.frontmatter dt {
-        font-weight: 600;
-        color: #666;
-      }
-      dl.frontmatter dd {
-        margin: 0;
-      }
-      table {
-        border-collapse: collapse;
-        margin: 1rem 0;
-      }
-      th,
-      td {
-        border: 1px solid rgba(127, 127, 127, 0.3);
-        padding: 0.4rem 0.7rem;
-        text-align: left;
-      }
-      pre {
-        background: rgba(127, 127, 127, 0.08);
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        overflow-x: auto;
-      }
-      a.back {
-        display: inline-block;
-        margin-bottom: 1rem;
-      }
-    </style>
-  </head>
-  <body>
-    <a class="back" href="/">← all roasts</a>
-    <h1>{d.title}</h1>
-    <p class="meta">
-      {d.date.toISOString().slice(0, 10)} · {d.target_level} · {d.roaster}
-    </p>
+<Base title={d.title}>
+  <a class="back" href="/">← all roasts</a>
+  <h1>{d.title}</h1>
+  <p class="meta">
+    {d.date.toISOString().slice(0, 10)} · {d.target_level} · {d.roaster}
+  </p>
 
-    <dl class="frontmatter">
-      {d.origin && <><dt>Origin</dt><dd>{d.origin}</dd></>}
-      {d.process && <><dt>Process</dt><dd>{d.process}</dd></>}
-      {d.vendor && <><dt>Vendor</dt><dd>{d.vendor}</dd></>}
-      {d.profile && <><dt>Profile</dt><dd>{d.profile}</dd></>}
-      {d.weight_setting && <><dt>Weight</dt><dd>{d.weight_setting}</dd></>}
-      {d.batch_size_g && <><dt>Batch (g)</dt><dd>{d.batch_size_g}</dd></>}
-      {d.green_weight_g && <><dt>Green (g)</dt><dd>{d.green_weight_g}</dd></>}
-      {d.roasted_weight_g && <><dt>Roasted (g)</dt><dd>{d.roasted_weight_g}</dd></>}
-      {d.ambient_f != null && <><dt>Ambient</dt><dd>{d.ambient_f}°F · {d.ambient_rh}% RH</dd></>}
-      {d.time_to_fc && <><dt>FC at</dt><dd>{d.time_to_fc}</dd></>}
-      {d.total_time && <><dt>Total</dt><dd>{d.total_time}</dd></>}
-      {d.color_at_fc && <><dt>Color @ FC</dt><dd>{d.color_at_fc}</dd></>}
-      {d.smell_at_fc && <><dt>Smell @ FC</dt><dd>{d.smell_at_fc}</dd></>}
-      {d.why_dropped && <><dt>Dropped on</dt><dd>{d.why_dropped}</dd></>}
-      {d.rating != null && <><dt>Rating</dt><dd>{d.rating}/10</dd></>}
-    </dl>
+  {stats.hasMeasurements && <RoastHeadline stats={stats} />}
 
-    <Content />
-  </body>
-</html>
+  {
+    d.roasted_photo && (
+      <section class="roast-photo-section">
+        <figure>
+          <Image
+            src={d.roasted_photo}
+            alt={`Cooled, roasted beans for ${d.title}`}
+            widths={[480, 720, 1080]}
+            sizes="(max-width: 720px) 100vw, 720px"
+            loading="lazy"
+            class="roast-photo"
+          />
+          <figcaption>Roasted beans — color reference</figcaption>
+        </figure>
+      </section>
+    )
+  }
+
+  <section class="roast-facts">
+    <h2 class="roast-facts-title">Roast plan</h2>
+    <div class="roast-facts-grid">
+      {d.origin && <div><dt>Origin</dt><dd>{d.origin}</dd></div>}
+      {d.process && <div><dt>Process</dt><dd>{d.process}</dd></div>}
+      {
+        d.product_url && (
+          <div>
+            <dt>Source</dt>
+            <dd>
+              <a href={d.product_url} target="_blank" rel="noopener">
+                {sourceLabel}
+              </a>
+            </dd>
+          </div>
+        )
+      }
+      <div><dt>Target level</dt><dd>{d.target_level}</dd></div>
+      <div><dt>Roaster</dt><dd>{d.roaster}</dd></div>
+      {d.profile && <div><dt>Profile</dt><dd>{d.profile}</dd></div>}
+      {d.batch_size_g && <div><dt>Batch size</dt><dd>{d.batch_size_g} g</dd></div>}
+      {d.weight_setting && <div><dt>Weight setting</dt><dd>{d.weight_setting}</dd></div>}
+      {d.green_weight_g && <div><dt>Green weight</dt><dd>{d.green_weight_g} g</dd></div>}
+      {
+        (d.ambient_f != null || d.ambient_rh != null) && (
+          <div>
+            <dt>Conditions</dt>
+            <dd>
+              {d.ambient_f != null && `${d.ambient_f}°F`}
+              {d.ambient_f != null && d.ambient_rh != null && " / "}
+              {d.ambient_rh != null && `${d.ambient_rh}% RH`}
+            </dd>
+          </div>
+        )
+      }
+    </div>
+
+    {
+      stats.targetLevel && (
+        <>
+          <h3 class="roast-facts-subtitle">Targets for <em>{d.target_level}</em></h3>
+          <div class="roast-facts-grid">
+            <div><dt>Weight loss</dt><dd>{stats.targetLevel.loss_pct[0]}–{stats.targetLevel.loss_pct[1]}%</dd></div>
+            <div><dt>DTR</dt><dd>{stats.targetLevel.dtr_pct[0]}–{stats.targetLevel.dtr_pct[1]}%</dd></div>
+            <div class="span2"><dt>Drop trigger</dt><dd>{stats.targetLevel.drop}</dd></div>
+            <div class="span2"><dt>Flavor goal</dt><dd>{stats.targetLevel.flavor}</dd></div>
+          </div>
+        </>
+      )
+    }
+
+    {
+      hasMeasured && (
+        <>
+          <h3 class="roast-facts-subtitle">Measured</h3>
+          <div class="roast-facts-grid">
+            {d.roasted_weight_g && <div><dt>Roasted</dt><dd>{d.roasted_weight_g} g</dd></div>}
+            {stats.lossPct != null && (
+              <div>
+                <dt>Weight loss</dt>
+                <dd>{stats.lossPct}% {stats.lossBadge && <span class={`badge ${stats.lossBadge}`}>{lossBadgeText}</span>}</dd>
+              </div>
+            )}
+            {d.time_to_fc && <div><dt>Time to FC</dt><dd>{d.time_to_fc}</dd></div>}
+            {d.total_time && <div><dt>Total time</dt><dd>{d.total_time}</dd></div>}
+            {stats.dev && <div><dt>Dev time</dt><dd>{stats.dev}</dd></div>}
+            {stats.dtrPct != null && (
+              <div>
+                <dt>DTR</dt>
+                <dd>{stats.dtrPct}% {stats.dtrBadge && <span class={`badge ${stats.dtrBadge}`}>{dtrBadgeText}</span>}</dd>
+              </div>
+            )}
+            {d.rating != null && <div><dt>Rating</dt><dd>{d.rating} / 10</dd></div>}
+          </div>
+        </>
+      )
+    }
+
+    {stats.phases && <PhaseBar phases={stats.phases} />}
+  </section>
+
+  {
+    d.bean_notes && (
+      <section class="roast-section">
+        <h2>Bean-specific notes</h2>
+        <Fragment set:html={md(d.bean_notes)} />
+      </section>
+    )
+  }
+
+  {
+    d.playbook && (
+      <section class="roast-section">
+        <h2>Today's playbook</h2>
+        <Fragment set:html={md(d.playbook)} />
+      </section>
+    )
+  }
+
+  {
+    hasLive && (
+      <section class="roast-section">
+        <h2>Live notes</h2>
+        <dl class="roast-live">
+          {d.color_at_fc && <><dt>Color at FC</dt><dd>{d.color_at_fc}</dd></>}
+          {d.smell_at_fc && <><dt>Smell at FC</dt><dd>{d.smell_at_fc}</dd></>}
+          {
+            d.interventions && (
+              <>
+                <dt>Button log</dt>
+                <dd><pre class="roast-interventions">{d.interventions}</pre></dd>
+              </>
+            )
+          }
+          {d.why_dropped && <><dt>Why dropped</dt><dd><Fragment set:html={md(d.why_dropped)} /></dd></>}
+          {d.anything_weird && <><dt>Anything weird</dt><dd><Fragment set:html={md(d.anything_weird)} /></dd></>}
+        </dl>
+      </section>
+    )
+  }
+
+  {
+    d.tasting_notes && (
+      <section class="roast-section">
+        <h2>Tasting notes</h2>
+        <Fragment set:html={md(d.tasting_notes)} />
+      </section>
+    )
+  }
+
+  {
+    d.next_time && (
+      <section class="roast-section">
+        <h2>What to change next time</h2>
+        <Fragment set:html={md(d.next_time)} />
+      </section>
+    )
+  }
+
+  {
+    entry.body?.trim() && (
+      <section class="roast-section">
+        <Content />
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .meta {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .roast-photo-section {
+    margin: 1em 0 1.5em;
+  }
+  .roast-photo-section figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4em;
+  }
+  .roast-photo {
+    max-width: min(100%, 720px);
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+  .roast-photo-section figcaption {
+    font-size: 0.85em;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .roast-facts {
+    margin: 1.5em 0 2em;
+    padding: 1em 1.25em;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-alt);
+  }
+  .roast-facts-title {
+    margin: 0 0 0.5em;
+    font-size: 1.1em;
+  }
+  .roast-facts-subtitle {
+    margin: 1em 0 0.5em;
+    font-size: 1em;
+    opacity: 0.85;
+  }
+  .roast-facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.5em 1em;
+    margin: 0;
+  }
+  .roast-facts-grid > div {
+    display: flex;
+    gap: 0.4em;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .roast-facts-grid > div.span2 {
+    grid-column: span 2;
+  }
+  .roast-facts-grid dt {
+    font-weight: 600;
+    opacity: 0.75;
+    margin: 0;
+  }
+  .roast-facts-grid dd {
+    margin: 0;
+  }
+  .badge {
+    font-size: 0.75em;
+    padding: 0.1em 0.45em;
+    border-radius: 3px;
+    margin-left: 0.3em;
+    white-space: nowrap;
+  }
+  .badge.ok { background: #c8e6c9; color: #1b5e20; }
+  .badge.under { background: #fff3cd; color: #856404; }
+  .badge.over { background: #f8d7da; color: #721c24; }
+
+  .roast-section {
+    margin: 1.5em 0;
+  }
+  .roast-section h2 {
+    margin-bottom: 0.5em;
+  }
+  .roast-live {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4em 1em;
+    margin: 0;
+  }
+  .roast-live dt {
+    font-weight: 600;
+    opacity: 0.75;
+  }
+  .roast-live dd {
+    margin: 0;
+  }
+  .roast-interventions {
+    margin: 0;
+    padding: 0.6em 0.8em;
+    background: var(--bg-alt);
+    border-left: 3px solid var(--muted);
+    border-radius: 0 4px 4px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+</style>

@@ -1,0 +1,260 @@
+---
+layout: ../../layouts/Base.astro
+title: "Behmor 2000 AB Plus — reference"
+---
+
+import BehmorAutoProfiles from "../../components/BehmorAutoProfiles.astro";
+import BehmorPowers from "../../components/BehmorPowers.astro";
+import BehmorWeights from "../../components/BehmorWeights.astro";
+
+<a href="/">← roastbook</a>
+
+# Behmor 2000 AB Plus — reference
+
+_Operational reference for the Behmor 2000 AB Plus pulled from the official Operation Manual V30 (Oct 2024) — origin-specific Auto Mode profiles, Manual Mode power controls, the pro sample roasting technique, safety, preheat, and full machine guidance._
+
+Sourced from the official [2000AB 120V Operation Manual V30 (Oct 2024)](http://www.behmor.com/docs/Behmor%202000AB%20120v%20Operation%20Manual%20V28%2011.19.2023%20BW%20Inspired.pdf) and the [Behmor knowledge base](https://behmor.com/knowledge-base/). Pulled into the site so it's available on-hand during a roast.
+
+---
+
+## The single most important thing: P1–P5 mean TWO things
+
+This is the easiest way to wreck a roast on this machine: P1–P5 have **different meanings** depending on whether you press them before or after Start.
+
+| When | What P1–P5 means |
+| --- | --- |
+| **BEFORE Start (Auto Mode)** | Origin-specific roast profile. Choose based on bean type. |
+| **AFTER Start (Manual Mode)** | Power level (0/25/50/75/100%). Use to drop power post-FC. |
+
+The manual makes this explicit (Part 3, page 8 and Part 5 page 12). If you treat P5 like "100% power" when selecting it as your starting Auto profile, you're actually picking the Hawaiian/island lowest-heat profile — wrong direction.
+
+## Auto Mode — pick by origin BEFORE pressing Start
+
+This is the chart from the manual that drives every roast plan on the site.
+
+<BehmorAutoProfiles />
+
+**Practical reading:** Centrals / Peruvian / Colombian → **P1** (or P2 for slightly gentler). Brazilian / African / SE Asian → **P3**. Kona and island coffees → **P4 or P5**. The default for the machine is P1; the manual recommends beginners run four ¼ lb batches on P1 to learn it.
+
+## Manual Mode — press P1–P5 AFTER Start
+
+Once a roast has started, the P buttons become power-level adjusters.
+
+<BehmorPowers />
+
+P4 and P5 are explicitly flagged as **not recommended after first crack** — combined with the bean mass already heated, they will scorch.
+
+## Two post-FC techniques — pick by goal
+
+The manual documents one approach (Professional Sample Roasting); forum and Sweet Maria's-library consensus uses a different one (C-button + Auto P1 hold) for drinking coffee. Both start the same way: ½ lb + P1 + Start. They diverge at first crack.
+
+### Professional Sample Roasting (manual Part 5, page 12-13) — sample roasting only
+
+1. Press desired weight + P1 + **START** (defaults to Auto P1)
+2. Once you hear first cracking, wait **10–15 seconds**
+3. Press **P3** (drops to 50% power in Manual mode)
+4. Press **D** (changes drum speed)
+5. May need to extend time using **+** or **C** button
+6. Press **Cool** when target hit
+
+The manual's rationale: *"Cutting power using the P3 button to 50% sustains heat, but gently allows the beans' exothermic momentum to work and prevent scorching beans."*
+
+**Use this for:** small evaluation batches where slow, low-development finish is intentional (cupping samples).
+
+**Don't use this for drinking coffee at ½ lb or 1 lb.** Roasts 006 and 007 logged on this site both used this technique and came in under-developed (8–9.4% loss vs 13–16% target, DTR 38%+) — the P3 cut starves development heat over the 3–5 minute development window.
+
+### C-button + Auto P1 hold — drinking coffee at ½ lb / 1 lb
+
+Synthesized from the Behmor knowledge base, Sweet Maria's library, and home-barista forum consensus.
+
+1. Press desired weight + P1 + **START**
+2. At the 75% shutoff prompt: press **C** to continue (also bypasses Err 7)
+3. At **first crack**: **check the remaining clock first.** If there's less than ~2:30 remaining, press **C** to reset to the Rosetta Stone duration. If there's more, *don't* press C — let Auto P1's original program run.
+4. **Stay on Auto P1** through the FC body — full heat carries development
+5. If you need more time near the end of the clock (low voltage, humid day): press **C** to extend toward the Rosetta Stone duration
+6. Only drop to **P3** if 2C threatens (rapid louder snaps, acrid smoke, oil sheen forming) — as a brake, not as the default
+7. Press **Cool** when target hit
+
+Rationale: full Auto P1 heat through FC body actually drives off moisture and progresses Maillard. The C-button shapes the time without cutting power.
+
+**Use this for:** drinking coffee at ½ lb or 1 lb, targeting City through Full City+.
+
+### Pure Manual mode + 50/30/20 phase targets — community technique (not from the manual)
+
+**Source: Virtual Coffee Lab YouTube — *Behmor Coffee Roasting Recipe* ([li_XZd1hrtI](https://www.youtube.com/watch?v=li_XZd1hrtI), Sep 2021).** Demonstrated on a **Behmor 1600 Plus**, not the 2000 AB Plus, so the heat-management button behavior and safety-shutoff threshold differ from this machine. Logged here as a community-sourced alternative to the two techniques above.
+
+1. Preheat the chamber to ~210 °F (B-temp), then load drum. On this site we've experimented with hotter charges (230–250 °F) by running 2 back-to-back 1:30 preheat cycles — shortens dry phase by ~2–3 min, see roast 012
+2. Press desired weight + P1 + **START**, then **immediately press P5** to switch to Manual mode (P-buttons now act as power levels, not Auto profiles)
+3. Log time + temperature every 30 seconds. Mark events: dry end, FC, drop
+4. **Ride a ~300 °F B-temp band.** As temp climbs and approaches 300, drop to **P4 (75%)** to back off heat. Press **D** to switch drum to high right after the P4 drop — this prevents the temp from stalling when you cut power. If temp falls under the band, return to **P5 (100%)** to bring it back up. Step P5↔P4 to hold the band through browning. (Mike's video confirms this pattern explicitly — transcript ~12:45–14:15.)
+5. At first crack: drop to **P3** (50%) for development
+6. **Cool** at the target level, accounting for ~15 s of cool-cycle carryover
+
+**Target phase split (his framework, not the manual's):** 50% dry / 30% browning / 20% development of total elapsed time, with naturals running shorter on development. Hitting 53/32/14 in the video produced his preferred cup on the bean.
+
+**Caveats before using this on a 2000 AB Plus:**
+
+- Mike's 320 °F ceiling is the 1600+'s safety shutoff. The 2000 AB Plus is different: it has **automatic element self-limiting at 310–314 °F B-temp** (see "Element self-limiting" section below) — the machine throttles its own heat to stay in that band even on P5. So the ~300 °F band Mike rides on his 1600 Plus is essentially the natural ceiling on this machine. **Riding P4↔P5 around 300 °F on the 2000 AB Plus is working *with* the soft hardware ceiling**, not against an external safety cap. The 1600+'s 330 °F over-temp shutoff doesn't apply here — the element self-limits long before that
+- The voiceover never mentions the C button, but Mike *does* press C near the end of the roast (observed in the video, unnarrated) — consistent with using C as a late extension lever per the `+ vs C` table below. The C-button + Auto P1 hold technique above is still the project's default for drinking coffee on this machine — try this one as a comparison, not as a replacement
+- Drop is **before 2C** — this is a Medium / Full City recipe, not a Medium-dark target. Pushing past Mike's drop into Medium-dark territory has been done on this site (roast 012 hit 14.7% loss with the band technique + real-FC timing) — extend development on P3 toward first 2C snap
+- **False crack vs real FC**: on roast 011 the popping at ~7–8 min turned out to be a false crack (bean expansion / moisture flashing). Real FC was ~12 min on standard charge / ~9–10 min on hot charge. False crack = scattered isolated pops; real FC = sustained rhythmic roll. Don't switch to P3 on false crack
+
+## `+` vs `C` — the most important machine quirk
+
+This is what trips up new Behmor users. **`+` adds to the clock. `C` resets the clock.** They are not interchangeable.
+
+| Button | What it does | When to press |
+| --- | --- | --- |
+| **+** | **ADDS** ~10s per press to the current clock | Fine-tuning a small definite extension. Has a per-roast cumulative cap (~+2:00 observed). |
+| **C** | **RESETS** the clock to the Rosetta Stone 1C→2C duration (does NOT add) | When the current clock has LESS time than you need for development. If current clock has MORE, C shortens the roast. |
+
+### The C-button reset values (approximate)
+
+| Weight setting | Rosetta Stone reset value |
+| --- | --- |
+| ¼ lb | ~1:30 |
+| ½ lb | ~2:09 (observed on roast 008) |
+| 1 lb | ~3:00+ |
+
+### When pressing C HELPS vs HURTS
+
+| Situation | Press C? | Why |
+| --- | --- | --- |
+| 75% shutoff (Err 7) fires | **Yes** | Bypasses Err 7. Reset value is roughly neutral here. |
+| FC arrives with under ~2:30 left on clock | **Yes** | C extends the clock to the Rosetta Stone value. |
+| FC arrives with 3:00+ left on clock (e.g. early FC) | **No** | C will SHORTEN the clock. Let Auto P1's original program run. |
+| Near end of clock (under ~1:30) and you need more time | **Yes** | C extends. Use repeatedly in low-voltage situations. |
+
+**Failure mode logged on roast 008:** FC came at 7:30 with 4:30 remaining on the ½ lb / 12:00 program. Pressing C at FC reset the clock to 2:09 — a 2:21 *cut* to available development time. Result: 8.85% loss vs 16–18% Medium-dark target, because the bean didn't get enough post-FC time at full Auto P1 heat.
+
+The forum technique "press C at FC" assumes FC arrives near the end of the program (typical for ½ lb dense SHB ~10–11 min FC). It doesn't generalize to early-FC situations.
+
+## Weight settings — default program time only
+
+The weight button sets the **program duration**. Heat is controlled by the profile (Auto) or by the P-power level (Manual).
+
+<BehmorWeights />
+
+Match the weight button to your actual charge. The 75% Err 7 safety shutoff fires at 75% of the program time. **For Full City+ darker roasts, manual recommends reducing the batch to 336 g (12 oz) for control** — full-pound batches retain too much thermal momentum past City+.
+
+## Preheat sequence
+
+1. Weigh green into drum. Keep drum **out** of machine.
+2. Press any weight + any profile + START. Run for **1:30 minutes** with drum out.
+3. Press **OFF**. Insert loaded drum + chaff tray.
+4. Start the actual roast.
+
+**⚠ Do not exceed 1:30 preheat** — the manual warns that longer preheats trigger a safety feature that prevents starting the roast.
+
+## 75% safety shutoff (Err 7)
+
+At 75% through the program, the display blinks `un:30..29..28` with loud beeping. You have 30 seconds to press **START** to continue. If you miss it, the machine enters cool mode and shows **Err 7**.
+
+The **C button bypasses Err 7** — pressing it during the warning window resets the timer per the Rosetta Stone and tells the machine you're actively engaged.
+
+## The C button (Rosetta Stone)
+
+The C button **RESETS** the clock to an approximate 1C→2C duration for the selected weight setting (~1:30 for ¼ lb, ~2:09 for ½ lb, ~3:00+ for 1 lb). It does **NOT add** to the current clock.
+
+This distinction matters a lot — see the "`+` vs `C`" section below for when pressing C extends vs shortens a roast. The short version: C extends only when the current remaining clock is LESS than the Rosetta Stone value. If MORE, C shortens.
+
+Three legitimate uses:
+
+1. **Bypass the Err 7 safety prompt** at 75% shutoff — signals active interaction
+2. **Extend time near end of clock** — Behmor KB notes "press it numerous times towards the end of the roast" for low-voltage extension
+3. **Anticipate 2C** — when used near end of program, the reset gives you a fresh count toward 2C
+
+## A/B temperature buttons
+
+- **A** — exhaust channel temperature (active once exhaust fan starts mid-roast)
+- **B** — chamber wall temperature
+
+Manual is emphatic: *"These temps ARE NOT bean temps and for information / correlation purposes only. Never gauge degree of roast based on these temps."*
+
+## Element self-limiting (~310–314 °F B-temp)
+
+The 2000 AB Plus has documented automatic heating-element self-limiting that kicks in around **310–314 °F B-temp** — the element throttles itself to stay in that band even when you're sitting on P5 (100%). Per the [Sweet Maria's library article on the 2000AB vs 1600 series](https://library.sweetmarias.com/no-the-behmor-1600-series-doesnt-run-hotter-than-the-2000ab-plus/), the newer 2000 models barely break 300 °F on the B sensor; 314 °F is the practical ceiling.
+
+Implications:
+
+- **You can't preheat past ~314 °F** no matter how many cycles you run. Hot charge to 230–250 °F is well under the ceiling and works fine.
+- **Riding a ~300 °F band with P5↔P4 stepping** is essentially shaping the curve under the self-limiter. If you sit on P5 too long, the limiter just kicks in and holds you flat — you lose ramp control. Stepping down to P4 *before* hitting 310 keeps you in command of the curve.
+- **This is NOT a hard shutoff** like the 1600+'s 330 °F over-temp error. The machine keeps roasting, just with the element throttled. There's no error code or interruption.
+- **The 75% Err 7 time-based shutoff** is still the only "machine cuts the roast" event on the 2000 AB Plus. Self-limiting is a heat-output throttle, not a roast-end event.
+
+## Sensory cues — sound, color, smell
+
+Because the A/B temps aren't bean temps, you roast by ear and by eye. Three sensory tracks to listen/watch/smell for:
+
+### FC vs 2C — sound
+
+| Event | Sound | Volume |
+| --- | --- | --- |
+| **False crack** | Scattered isolated pops (1–3 sounds), then quiet | Soft, dispersed |
+| **Real FC** | Sustained rhythmic popping that builds into a roll, then winds down | LOUD — wet popcorn pops |
+| **Real 2C** | Faster, drier, sharper crackles after FC has fully wound down | Quieter than FC — like Rice Krispies or breaking dry twigs |
+
+If a sound is louder than what you've already heard at FC, it's still FC — not 2C. The "louder = later" assumption is wrong: 2C is *quieter* than FC, just faster and sharper.
+
+### Color progression
+
+green → yellow (dry end) → tan → brown → deep brown (real FC) → darker with patches → oily sheen starting (close to 2C).
+
+The Behmor's interior light has a yellow tinge; the green→yellow transition is hardest to call by eye. Use the smell shift as a corroborator.
+
+### Smell progression
+
+hay → bread → toast → caramel → cocoa → resinous.
+
+- **Resinous = past the safety line.** If the smell shifts from cocoa to anything sharper/oilier, press Cool.
+- Smell alone is not a reliable drop trigger — different beans land different levels at the same smell shift. Use the **sound cues** (audible 2C) for drop timing.
+
+## What "dark" means on this machine
+
+The level reference table in [Methods & reference](/roasts/methods/) defines five levels from Light through Dark. **Not all of them are safely targetable on the Behmor 2000 AB Plus.** The manual is explicit on two limits:
+
+- *"The Behmor Roaster is not intended to roast coffee to levels known as Vienna, French, or Italian."*
+- *"Never roast past 10 seconds into second crack."*
+
+Mapping our level table to what's achievable on this machine:
+
+| Level | Drop trigger (per `src/data/roast_guidance.yaml`) | Behmor-safe? |
+| --- | --- | --- |
+| Light | 15–45s after FC starts, before any oil sheen | Yes |
+| Light-medium | 30–60s into development | Yes |
+| Medium | End of FC through 1:30–2:30 development | Yes |
+| Medium-dark | First few snaps of 2C | **Yes — at the safety ceiling.** Drop within 10 sec of first 2C snap. |
+| Dark | Rolling SC, before oil floods | **No** — requires staying in 2C past the 10-second line; violates the manual. |
+
+So in practice the deepest roast you can target safely is **Medium-dark / Full City+**, with the drop trigger being the *first 1–3 snaps* of 2C. For darker than that you need a different machine.
+
+## Critical safety constraints
+
+These come straight from the manual and they are not soft rules:
+
+- **Allow 1 HOUR between roasts.** Not minutes — the manual states this as a direct rule (Part 4 Important Reminders #4).
+- **Never roast past 10 seconds into second crack.** Past this point beans can ignite.
+- **Never start above ¼ lb when first learning.** The manual is loud about this — start with four ¼ lb batches on P1.
+- **The 2000 AB Plus is not intended for Vienna, French, or Italian roasts.** Oily beans + chaff tray = fire risk.
+- **Never leave the roaster unattended.** Explicit in the manual title: *"NOT a set and walk away device."*
+
+## Beginner guidance
+
+From manual Part 3:
+
+- Roast **four ¼ lb batches on P1** to learn FC sounds, color cues, smell changes.
+- After ¼ lb is comfortable, move to ½ lb. Move to 1 lb last.
+- Always forward-think the roast by 15 seconds (the reversal time from roasting to cooling).
+- **Never gauge degree of roast by oil appearance** — drum roasters don't show oil during the roast; droplets appear 24h–several days after, especially with rest.
+
+## Cleaning
+
+- Every **5 roasts** (more often for darker roasts), do a dry burn (¼ lb + Start, run full program) with the interior cleaned by Simple Green or other non-caustic / non-abrasive cleaner.
+- Never spray heating elements.
+- Keep the back-lower-right corner of the roasting chamber clean — the thermocouple sensor lives there. Dirty sensor = extended / wrong roast times.
+
+## Sources
+
+- [Behmor Roaster Quick Start Guide](https://behmor.com/knowledge-base/behmor-roaster-quick-start-guide/) — Behmor knowledge base
+- [Control Panel Features & Auto-Safety Shutoff](https://behmor.com/knowledge-base/behmor-roaster-control-panel-features-auto-safety-shutoff/) — Behmor knowledge base
+- [2000AB Plus 120V Operation Manual V30 (Oct 2024)](http://www.behmor.com/docs/Behmor%202000AB%20120v%20Operation%20Manual%20V28%2011.19.2023%20BW%20Inspired.pdf) — official manual

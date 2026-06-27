@@ -1,0 +1,26 @@
+---
+import { behmor } from "../lib/roastData";
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr>
+      <th>Profile</th>
+      <th>Bean type</th>
+      <th>Recommended origins</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      behmor.auto_mode_profiles.map((p) => (
+        <tr>
+          <td><strong>{p.id}</strong></td>
+          <td>{p.bean_type}</td>
+          <td>{p.origins.join(", ")}</td>
+          <td>{p.notes}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

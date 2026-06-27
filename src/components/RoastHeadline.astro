@@ -1,0 +1,81 @@
+---
+import type { RoastStats } from "../lib/roastStats";
+interface Props {
+  stats: RoastStats;
+}
+const { stats } = Astro.props;
+const dash = "—";
+---
+
+<section class="roast-headline">
+  <div class="roast-headline-stats">
+    <div class="hstat"><span class="hstat-label">FC</span><span class="hstat-value">{stats.fc ?? dash}</span></div>
+    <div class="hstat"><span class="hstat-label">Total</span><span class="hstat-value">{stats.total ?? dash}</span></div>
+    <div class="hstat"><span class="hstat-label">Dev</span><span class="hstat-value">{stats.dev ?? dash}</span></div>
+    <div class="hstat"><span class="hstat-label">DTR</span><span class="hstat-value">{stats.dtrPct != null ? `${stats.dtrPct}%` : dash}</span></div>
+    <div class="hstat"><span class="hstat-label">Loss</span><span class="hstat-value">{stats.lossPct != null ? `${stats.lossPct}%` : dash}</span></div>
+  </div>
+  {
+    stats.ready && (
+      <div class="roast-ready">
+        <div class="roast-ready-main">
+          <span class="hstat-label">Ready to drink</span>
+          <span class="hstat-value">{stats.ready.text}</span>
+          <span class={`roast-status roast-status-${stats.ready.status}`}>{stats.ready.status}</span>
+        </div>
+        <div class="roast-ready-detail">{stats.ready.detail}</div>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .roast-headline {
+    margin: 1em 0 1.5em;
+    padding: 0.9em 1.1em;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .roast-headline-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.5em 1.25em;
+  }
+  .hstat { display: flex; flex-direction: column; gap: 0.15em; }
+  .hstat-label {
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .hstat-value {
+    font-size: 1.35em;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .roast-ready {
+    margin-top: 0.85em;
+    padding-top: 0.85em;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+  }
+  .roast-ready-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6em; }
+  .roast-ready-detail { font-size: 0.85em; color: var(--muted); }
+  .roast-status {
+    display: inline-block;
+    padding: 0.15em 0.65em;
+    border-radius: 999px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .roast-status-resting { background: #fff3cd; color: #856404; }
+  .roast-status-ready { background: #c8e6c9; color: #1b5e20; }
+  .roast-status-past-peak { background: #f8d7da; color: #721c24; }
+</style>

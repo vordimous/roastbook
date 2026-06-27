@@ -7,3 +7,8 @@ dist
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .ref/
+
+# Work-in-progress scratch roasts (Obsidian "_" prefix; excluded by the loader)
+src/content/roasts/_*.md
+# ...but keep the new-roast scaffold under version control
+!src/content/roasts/_TEMPLATE.md

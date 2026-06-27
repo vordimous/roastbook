@@ -1,0 +1,28 @@
+---
+import { behmor } from "../lib/roastData";
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr>
+      <th>Actual charge</th>
+      <th>Weight button</th>
+      <th>Program time</th>
+      <th>75% shutoff at</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      behmor.weight_settings.map((w) => (
+        <tr>
+          <td>{w.label}</td>
+          <td><strong>{w.setting}</strong></td>
+          <td>{w.program_time}</td>
+          <td>{w.shutoff_elapsed} elapsed</td>
+          <td>{w.note}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

@@ -1,0 +1,30 @@
+---
+// Sveltia CMS mount, served at /admin/.
+//
+// Why a route and not a static public/admin/index.html: Astro's dev and preview
+// servers don't serve directory indexes, so /admin/ 404s for a static file
+// (only /admin/index.html resolves). A route makes /admin/ work uniformly in
+// dev, preview, and production.
+//
+// The bundle auto-loads ./config.yml (served from public/admin/config.yml,
+// emitted from src/content.config.ts by scripts/emit-sveltia-config.ts).
+// `is:inline` keeps Astro from bundling the external script; the Sveltia docs
+// warn against type="module" and CSS links, so neither is used.
+//
+// Local editing: open this page in a Chromium browser (Chrome/Edge/Brave),
+// click "Work with Local Repository", and pick the repo root. No proxy or
+// GitHub repo needed — Sveltia reads/writes the working tree directly.
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Roastbook · Admin</title>
+  </head>
+  <body>
+    <script is:inline src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+  </body>
+</html>

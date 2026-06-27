@@ -1,0 +1,102 @@
+---
+import Base from "../../layouts/Base.astro";
+import { poppo } from "../../lib/roastData";
+
+const b = poppo.observed_baselines as Record<string, any>;
+const range = (r: unknown) => (Array.isArray(r) ? `${r[0]}–${r[1]}` : String(r ?? "—"));
+---
+
+<Base title={`${poppo.name} — reference`}>
+  <a class="back" href="/">← roastbook</a>
+  <h1>{poppo.name} — reference</h1>
+  <p class="lead">
+    An air popcorn popper used by John &amp; Pamela as a small-batch coffee roaster.
+    There is no operation manual — <strong>every value here is observed</strong> from
+    their {b.roast_count}-roast log ({b.log_window}), not vendor guidance. Treat each
+    number as an empirical starting reference.
+  </p>
+
+  <h2>Observed baselines</h2>
+  <table>
+    <tbody>
+      <tr><th>Charge</th><td>{b.charge_g} g</td></tr>
+      <tr><th>Yield</th><td>{range(b.yield_g_range)} g</td></tr>
+      <tr><th>Weight loss</th><td>{range(b.weight_loss_pct_range)}%</td></tr>
+      <tr><th>First crack</th><td>{b.first_crack_range}</td></tr>
+      <tr><th>Total time</th><td>{b.total_time_range}</td></tr>
+      <tr><th>Development</th><td>{b.development_time_range}</td></tr>
+      <tr><th>DTR</th><td>{range(b.dtr_pct_range)}%</td></tr>
+      <tr><th>Ambient tracked</th><td>{range(b.ambient_temp_range_f)} °F</td></tr>
+    </tbody>
+  </table>
+  <p class="note">{b.dtr_pct_range && "Air poppers run DTR well above the 17–22% drum-roaster target because total roast time is so short — not a defect."}</p>
+  <p class="note">{b.ambient_temp_note}</p>
+
+  <h2>Highest-scoring roasts</h2>
+  <table>
+    <thead><tr><th>Origin</th><th>Score</th><th>FC</th><th>Total</th><th>Loss</th></tr></thead>
+    <tbody>
+      {
+        poppo.high_score_targets.map((t) => (
+          <tr>
+            <td>{t.origin}</td>
+            <td>{t.score}</td>
+            <td>{t.fc}</td>
+            <td>{t.total}</td>
+            <td>{t.loss_pct}%</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2>Preferred cup</h2>
+  <p><strong>Favored:</strong> {poppo.preferred_cup.favored.join(", ")}.</p>
+  <p><strong>Disfavored:</strong> {poppo.preferred_cup.disfavored.join(", ")}.</p>
+
+  <h2>Weight settings</h2>
+  <table>
+    <thead><tr><th>Charge</th><th>Setting</th><th>Program time</th><th>Note</th></tr></thead>
+    <tbody>
+      {
+        poppo.weight_settings.map((w) => (
+          <tr><td>{w.label}</td><td>{w.setting}</td><td>{w.program_time}</td><td>{w.note}</td></tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2>Cooling</h2>
+  <p>{poppo.cooling.method}</p>
+  <p class="note">{poppo.cooling.note}</p>
+
+  <h2>Safety</h2>
+  <p class="note">{poppo.safety.between_roasts_note}</p>
+  <p class="note">{poppo.safety.past_2c_warning}</p>
+  <ul>
+    {poppo.safety.generic_air_popper_notes.map((n) => <li>{n}</li>)}
+  </ul>
+
+  <h2>Preheat</h2>
+  <p class="note">{poppo.preheat.instruction}</p>
+
+  <p class="provenance">
+    <strong>Source:</strong> {poppo.provenance.source}. {poppo.provenance.caveat}
+  </p>
+</Base>
+
+<style>
+  .back { display: inline-block; margin-bottom: 1rem; }
+  .lead { font-size: 1.05rem; }
+  h2 { margin-top: 1.75rem; }
+  table { width: 100%; }
+  th { text-align: left; }
+  .note { color: var(--muted); font-size: 0.92rem; }
+  .provenance {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+</style>

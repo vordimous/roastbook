@@ -1,0 +1,20 @@
+---
+import { roastGuidance } from "../lib/roastData";
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr><th>Quantity</th><th>Formula</th><th>Why it matters</th></tr>
+  </thead>
+  <tbody>
+    {
+      roastGuidance.formulas.map((f) => (
+        <tr>
+          <td>{f.name}</td>
+          <td><code>{f.formula}</code></td>
+          <td>{f.purpose}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

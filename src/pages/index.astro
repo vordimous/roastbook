@@ -1,66 +1,135 @@
 ---
 import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import { computeRoastStats } from "../lib/roastStats";
 
+// Drafts are visible in dev (and the CMS preview) but excluded from prod builds.
 const roasts = (await getCollection("roasts"))
-  .filter((r) => !r.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  .filter((r) => !import.meta.env.PROD || !r.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .map((r) => ({ entry: r, stats: computeRoastStats(r.data) }));
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>roastbook-spike</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-      body {
-        font: 16px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-        max-width: 760px;
-        margin: 2rem auto;
-        padding: 0 1.25rem;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      li {
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(127, 127, 127, 0.2);
-      }
-      a {
-        text-decoration: none;
-        font-weight: 600;
-      }
-      .date {
-        color: #888;
-        font-size: 0.9rem;
-        margin-right: 0.5rem;
-      }
-      .level {
-        color: #888;
-        font-size: 0.85rem;
-        margin-left: 0.5rem;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>roastbook-spike</h1>
-    <p>
-      Phase-0 scaffold. <code>pnpm dev</code> serves this list; click a roast
-      to render frontmatter + body.
-    </p>
-    <ul>
-      {
-        roasts.map((r) => (
-          <li>
-            <span class="date">{r.data.date.toISOString().slice(0, 10)}</span>
-            <a href={`/roasts/${r.id}/`}>{r.data.title}</a>
-            <span class="level">· {r.data.target_level}</span>
-          </li>
-        ))
-      }
-    </ul>
-  </body>
-</html>
+<Base title="roastbook">
+  <h1>Roast Log</h1>
+  <p class="intro">
+    Running log of home coffee roasts — what I dialed in, what happened in the
+    drum, and how the cup turned out. Click a roast for the full plan,
+    measurements, and notes.
+  </p>
+
+  <p class="guides">
+    <a href="/roasts/methods/">→ Methods &amp; reference</a>
+    <span class="guides-hint">how the numbers are computed</span>
+    <br />
+    <a href="/roasts/behmor-2000ab/">→ Behmor 2000 AB Plus</a>
+    <span class="guides-hint">drum-roaster cheat sheet</span>
+    <br />
+    <a href="/roasts/poppo/">→ Poppo (air popper)</a>
+    <span class="guides-hint">observed air-popper baselines</span>
+    <br />
+    <a href="/roasts/behmor-video-notes/">→ Behmor video notes</a>
+    <span class="guides-hint">community technique breakdown</span>
+  </p>
+
+  <ul class="roast-list">
+    {
+      roasts.map(({ entry: r, stats }) => (
+        <li class="roast-item">
+          <a class="roast-link" href={`/roasts/${r.id}/`}>
+            <span class="roast-title">
+              {r.data.title}
+              {r.data.draft && <span class="draft-badge">draft</span>}
+              {stats.ready && (
+                <span class={`roast-status roast-status-${stats.ready.status}`}>{stats.ready.status}</span>
+              )}
+            </span>
+            <span class="roast-sub">
+              <span class="roast-date">{r.data.date.toISOString().slice(0, 10)}</span>
+              <span class="roast-level">{r.data.target_level}</span>
+              {stats.lossPct != null && <span>{stats.lossPct}% loss</span>}
+              {stats.dtrPct != null && <span>{stats.dtrPct}% DTR</span>}
+              {r.data.rating != null && <span class="roast-rating">{r.data.rating}/10</span>}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .intro {
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .guides {
+    margin: 0 0 1.5rem;
+    line-height: 1.9;
+  }
+  .guides-hint {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-left: 0.4rem;
+  }
+  .roast-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .roast-item {
+    border-bottom: 1px solid rgba(127, 127, 127, 0.2);
+  }
+  .roast-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.75rem 0.25rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .roast-link:hover {
+    background: var(--bg-alt);
+  }
+  .roast-title {
+    font-weight: 600;
+    color: #3b82f6;
+  }
+  .draft-badge {
+    display: inline-block;
+    margin-left: 0.5em;
+    padding: 0.05em 0.5em;
+    border-radius: 999px;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #fff3cd;
+    color: #856404;
+    vertical-align: middle;
+  }
+  .roast-sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .roast-level {
+    font-weight: 600;
+  }
+  .roast-status {
+    display: inline-block;
+    margin-left: 0.5em;
+    padding: 0.05em 0.5em;
+    border-radius: 999px;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+  }
+  .roast-status-resting { background: #fff3cd; color: #856404; }
+  .roast-status-ready { background: #c8e6c9; color: #1b5e20; }
+  .roast-status-past-peak { background: #f8d7da; color: #721c24; }
+</style>

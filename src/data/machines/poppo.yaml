@@ -1,0 +1,105 @@
+# Architecture docs: src/content/roasts/CLAUDE.md
+#
+# Poppo — air popcorn popper used by John & Pamela as a small-batch coffee
+# roaster. "Poppo" is their household name for the rig, not a documented
+# brand. There is no operation manual to cite; all values below are
+# *observed* from their 12-roast log (May 31 – Jun 18, 2025), not
+# manufacturer guidance. Treat every field as empirical, not authoritative.
+#
+# Sources:
+#   - John & Pamela's Poppo Coffee Roasting Log, May–Jun 2025 (12 roasts)
+#
+# Unknown / not documented:
+#   - Make and model of the popper
+#   - Control surface (heat dial, fan speed, voltage controller, stirrer mod)
+#   - Manufacturer-recommended preheat or between-roast wait
+#   - Safety constraints specific to this unit
+# If any of those are confirmed later, add them and tighten this file.
+
+name: Poppo (air popper)
+reference_url: "/roasts/poppo/"
+
+# ─────────────────────────────────────────────────────────────────────────
+# Observed baselines — derived directly from the May–Jun 2025 log.
+# Use these as targets when planning a Poppo roast; do not present them as
+# vendor specs.
+# ─────────────────────────────────────────────────────────────────────────
+
+observed_baselines:
+  log_window: "2025-05-31 to 2025-06-18"
+  roast_count: 12
+  charge_g: 100
+  yield_g_range: [83, 84]
+  weight_loss_pct_range: [16, 17]
+  first_crack_range: "3:10 – 3:40"
+  total_time_range: "5:10 – 5:50"
+  development_time_range: "1:50 – 2:25"
+  # DTR computed as (total - FC) / total across the 12 logged roasts.
+  # Air poppers routinely run DTR well above the 17–22% drum-roaster target
+  # because total roast time is so short — do not flag this as a defect.
+  dtr_pct_range: [35, 43]
+  cooling: "Rapid external fan cooling required immediately after drop."
+  ambient_temp_tracked: true
+  ambient_temp_range_f: [64, 92]
+  ambient_temp_note: "Logged on every roast — household treats ambient as a meaningful variable for FC timing. No clean correlation visible in 12 data points, but they track it."
+
+# Highest-scoring outcomes from the log (≥4.6/5), kept as a reference for
+# what "a good Poppo roast" looks like in their cup. Not a guarantee on
+# other beans.
+high_score_targets:
+  - origin: "Colombia Sierra Nevada La Esperanza"
+    score: 4.8
+    fc: "3:10–3:20"
+    total: "5:35–5:40"
+    loss_pct: "16–17"
+  - origin: "Guatemala Huehuetenango (HHT)"
+    score: 4.7
+    fc: "3:10–3:20"
+    total: "5:11–5:30"
+    loss_pct: "16–17"
+  - origin: "Colombia Tolima Finca La Leona"
+    score: 4.6
+    fc: "3:40"
+    total: "5:40"
+    loss_pct: "16"
+
+# Flavor profile this household consistently scores high — useful when
+# matching a new bean to the Poppo rig.
+preferred_cup:
+  favored: ["sweetness", "chocolate", "caramel", "smooth body", "low bitterness", "balanced acidity"]
+  disfavored: ["sourness", "sharp fruit acidity", "highly fermented", "extremely bright"]
+
+# Weight settings for single.html lookup. Only one batch size is in the
+# log (100 g), so this is a single-row table bracketing that.
+weight_settings:
+  - label: "100 g (observed)"
+    charge_min: 70
+    charge_max: 150
+    setting: "100 g"
+    program_time: "≈5:30 observed"
+    note: "Only batch size in the log. No evidence the popper has a programmed time — this is the typical roast-to-drop window observed across 12 roasts. End time controlled by operator, not by machine."
+
+# No documented preheat. Air poppers typically run a short empty cycle
+# before charging; capture as unknown rather than invent a duration.
+preheat:
+  duration_sec: null
+  instruction: "Not documented in the log. Common air-popper practice is a brief empty warm-up (~30–60s) before charging green, but the Poppo log does not specify."
+
+safety:
+  between_roasts_minutes: null
+  between_roasts_note: "Not documented. Air poppers can overheat with back-to-back roasts; let the unit cool to room temp between runs unless the household has confirmed otherwise."
+  past_2c_warning: "Air poppers offer no thermal mass to brake a runaway roast — once 2C starts, the time to scorch is short. The log does not push into 2C; preferred-cup profile is well clear of that line."
+  generic_air_popper_notes:
+    - "Chaff escapes the bowl during roast — run over a tray or outdoors."
+    - "Unmodified popcorn poppers are not UL-rated for coffee roasting; never leave unattended."
+    - "Heating element failure mode on consumer poppers is open flame, not just shutoff — keep clear of curtains and flammables."
+
+cooling:
+  method: "External fan or colander+sieve transfer immediately on drop."
+  note: "The log explicitly cites rapid fan cooling as part of the technique. Without an active cooling step, residual heat will continue to develop the roast past the intended drop."
+
+# Source attribution — these are observed numbers, not vendor specs.
+provenance:
+  source: "John & Pamela's Poppo Coffee Roasting Log, May 31 – June 18, 2025"
+  roast_count: 12
+  caveat: "All values are empirical observations from one household's log. No machine manual exists. Treat every field as a starting reference, not authoritative guidance."

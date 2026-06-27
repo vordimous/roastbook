@@ -1,0 +1,32 @@
+---
+import { roastGuidance } from "../lib/roastData";
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr>
+      <th>Level</th>
+      <th>Weight loss %</th>
+      <th>DTR %</th>
+      <th>Rest (days)</th>
+      <th>Drop temp (bean °F)</th>
+      <th>Drop trigger</th>
+      <th>Flavor profile</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      roastGuidance.levels.map((l) => (
+        <tr>
+          <td><strong>{l.name}</strong></td>
+          <td>{l.loss_pct[0]}–{l.loss_pct[1]}%</td>
+          <td>{l.dtr_pct[0]}–{l.dtr_pct[1]}%</td>
+          <td>{l.rest_days[0]}–{l.rest_days[1]}</td>
+          <td>{l.drop_temp_f[0]}–{l.drop_temp_f[1]} °F</td>
+          <td>{l.drop}</td>
+          <td>{l.flavor}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

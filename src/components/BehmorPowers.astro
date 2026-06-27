@@ -1,0 +1,40 @@
+---
+import { behmor } from "../lib/roastData";
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr>
+      <th>Button</th>
+      <th>Power</th>
+      <th>Use</th>
+      <th>OK after FC?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      behmor.manual_mode_powers.map((p) => (
+        <tr>
+          <td><strong>{p.id}</strong></td>
+          <td>{p.power_pct}%</td>
+          <td>
+            {p.use}
+            {p.warning && (
+              <>
+                <br />
+                <span class="warn">⚠ {p.warning}</span>
+              </>
+            )}
+          </td>
+          <td>{p.post_fc_ok ? "✓" : "✗"}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<style>
+  .warn {
+    color: #856404;
+  }
+</style>

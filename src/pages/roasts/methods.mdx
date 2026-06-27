@@ -1,0 +1,120 @@
+---
+layout: ../../layouts/Base.astro
+title: "Methods & reference"
+---
+
+import RoastFormulas from "../../components/RoastFormulas.astro";
+import RoastLevels from "../../components/RoastLevels.astro";
+import PhaseTemps from "../../components/PhaseTemps.astro";
+
+<a href="/">← roastbook</a>
+
+# Methods & reference
+
+_How the numbers on each roast page are calculated, and the lookup tables that drive the expected-range panel._
+
+Every roast page computes derived values from a few raw inputs and compares them against industry-consensus targets. This page documents the formulas and the lookup tables so you can verify any number on the site by hand — and so the rules live in one editable place, not scattered through templates.
+
+## Session conditions
+
+Two ambient readings logged at roast start — not used in any formula today, but tracked because they explain session-to-session variation in FC timing:
+
+| Field | Effect |
+| --- | --- |
+| `ambient_f` | Higher temp → earlier FC; compounding heat in back-to-back sessions |
+| `ambient_rh` | Higher RH → beans carry more moisture → longer drying phase → FC comes later |
+
+The two effects can partially cancel: a hot, humid day (91°F / 65% RH) will pull FC earlier via heat but push it later via moisture. Once you have 10+ roasts logged, compare FC times against these readings to see which variable dominates on your machine in your space.
+
+## Raw inputs
+
+These are logged per roast. Everything in the "Measured" panel on a roast page is derived from them — no double-entry, no drift.
+
+| Field | What it is | When to log |
+| --- | --- | --- |
+| `green_weight_g` | Weighed grams before the roast | Pre-roast |
+| `roasted_weight_g` | Weighed grams after cooling | Post-roast |
+| `time_to_fc` (mm:ss) | Elapsed time from Start to the first audible pop | At first crack |
+| `total_time` (mm:ss) | Elapsed time from Start to when you hit Cool | At drop |
+
+The two ambient readings above (`ambient_f`, `ambient_rh`) are also raw inputs, but they don't feed any formula yet — they're recorded for pattern-finding once batch history grows.
+
+## Derived values
+
+The single-page panel computes these automatically; you can match them with a calculator.
+
+<RoastFormulas />
+
+### Worked example
+
+For a roast with `green_weight_g: 227`, `roasted_weight_g: 193`, `time_to_fc: 10:30`, `total_time: 12:45`:
+
+- **Weight loss:** (227 − 193) / 227 × 100 = **15.0%**
+- **Development time:** 12:45 − 10:30 = **2:15**
+- **DTR:** 135s / 765s × 100 = **17.6%**
+
+## Roast phases (50/30/20)
+
+A roast divides into three phases, split by two logged events:
+
+| Phase | From → to | What's happening |
+| --- | --- | --- |
+| **Drying** | start → **dry end** (`time_to_dry_end`) | Free moisture driven off; beans go green → yellow (bean ≈ 150 °C / 302 °F). |
+| **Maillard / browning** | dry end → **first crack** (`time_to_fc`) | Browning reactions build sweetness and body. |
+| **Development** | first crack → **drop** (`total_time`) | First crack starts around bean ≈ 196 °C / 385 °F; acidity drops, body and caramelization build. This % is the DTR. |
+
+> Those temperatures are **bean temperatures** (the universal roasting science), stated in °C with °F in parentheses. They are **not** the Behmor's on-screen readings: the A/B buttons report **chamber/exhaust temperature in °F** and are explicitly *not* bean temps — don't compare your logged B-temp (e.g. ~300 °F) against the bean-temp figures above. Roast by the **events** (yellowing, first crack), not by matching a number.
+
+### Phase-transition bean temperatures
+
+The bean-temperature landmarks each transition happens at, from probe-roaster literature. Use them to understand *what* is happening at each event — **not** as setpoints on the Behmor.
+
+<PhaseTemps />
+
+> ⚠️ **These are bean temps, not your Behmor readout.** The Behmor's B-temp is a chamber reading that self-limits around 310–314 °F — at first crack it reads ~290–300 °F while the *bean* is actually ~385–401 °F. You **cannot** match these numbers on this machine. They're the universal science (and useful if you ever add a bean probe); on the Behmor you roast by **events + the ~300 °F band**, and the actionable per-phase targets are **times** (dry end ~5–6 min, FC ~10–11 min) and **sounds**, not temperatures. The **drop temps** in the [target-level table](#target-level-reference) below are bean temps too.
+
+The **50/30/20** heuristic aims for roughly half the roast in drying, ~30% browning, ~20% development. It's a starting shape, not a setpoint — variants like 45/35/20 are common, and development is pulled shorter (12–15%) for delicate/floral coffees or longer (18–25%) for chocolate/spice. The split is computed only when `time_to_dry_end` is logged, and each roast page shows your actual split against the target (within ±5 points = on profile). Targets live in `src/data/roast_guidance.yaml` (`phase_targets`).
+
+**To track phases during a roast, log the dry-end time** — the moment the beans turn from green to yellow and the smell shifts hay → bread — alongside `time_to_fc` and `total_time`. Without it, only DTR (the development share) can be computed.
+
+## Resting / ready-to-drink window
+
+Fresh-roasted coffee needs to degas before it tastes right. CO₂ trapped in the beans interferes with extraction; brew too soon and the cup tastes flat or sour and espresso channels. Darker roasts shed CO₂ faster than light roasts (longer pyrolysis = more porous structure).
+
+The `rest_days` ranges in the reference table are tuned for a **drum roaster brewed by filter methods**, which is what this site logs. Two assumptions baked into the numbers:
+
+- **Drum vs air.** Scott Rao notes classic-drum roasts don't benefit from more than 1–2 days of rest unless underdeveloped; air roasters (Loring, IKAWA) often need 1–4 weeks. The Behmor is a drum roaster.
+- **Filter vs espresso.** Filter brewing vents CO₂ freely, so short rests work — vendor "12–24hr" minimums on the bag are real. Espresso runs at 9 bar with nowhere for gas to escape and channels without more rest. **For espresso, add ~5–7 days to the upper bound of each range.**
+
+**The rest window uses the measured weight loss to pick the level, not the target_level.** If you aimed for Medium-dark but the roast actually landed at 14% loss (Medium territory), the rest window reflects what the bean *became*, not what you *aimed for*. This avoids the trap of underdeveloped roasts being shown as ready in 1–4 days when they actually need 1–10 like a light. Boundaries (midpoints between adjacent levels' loss midpoints): `<13.5` light · `13.5–14.5` light-medium · `14.5–16` medium · `16–18` medium-dark · `≥18` dark.
+
+The single-page panel compares today against the level's window and shows a status pill:
+
+- **Resting** — under the lower bound; CO₂ may still fight extraction
+- **Ready** — in the peak window; brew and rate
+- **Past peak** — drinkable for weeks more, but aromatics are fading (faster for dark/oily — Rao recommends drinking those within days)
+
+## Target level reference
+
+These ranges drive the "Expected" column in the panel. They are industry-consensus starting points and apply to any roaster — calibrate against your own batches over time. The **drop-temp column is bean temperature in °F** (the universal landmark for each level) — *not* the Behmor B-temp; on this machine you hit these levels by the drop trigger and sound, not by the number.
+
+<RoastLevels />
+
+## Machine-specific guidance
+
+This page is intentionally machine-agnostic. For machine-specific guidance — power profiles, weight-setting program times, preheat sequences, safety features — see the page for your roaster:
+
+- [Behmor 2000 AB Plus](/roasts/behmor-2000ab/) — current machine
+
+## Sources
+
+- Genuine Origin — [Roast Profiles 101](https://blog.genuineorigin.com/2025/11/guide-to-roast-profiles/) (DTR 16–20% target across origins)
+- Scott Rao — *The Coffee Roaster's Companion* (DTR > ~24% risks baking)
+- Sweet Maria's — roast color and loss percentage guide
+- Green Coffee Collective — [Types of Coffee Roasts](https://greencoffeecollective.com/blogs/learn/types-of-coffee-roasts)
+- Scott Rao — [Resting Roasts: Is Fresher Better?](https://www.scottrao.com/blog/restingbeans) (rest_days; drum vs air roaster differences)
+- Barista Hustle — [Phases of the Roasting Profile](https://www.baristahustle.com/lesson/htr-4-02-phases-of-the-roasting-profile/) (drying / Maillard / development split)
+
+## Caveats
+
+Most published targets — the 8–9 min FC benchmark, DTR ranges, the temperature thresholds — come from drum roasters with bean-probe feedback. Probeless home roasters like the Behmor run a fixed time/power program and are roasted by ear. Treat the numbers as the *shape* you're aiming for, not setpoints to dial in directly. The reference values on this page get more honest the more of your own batches you log.

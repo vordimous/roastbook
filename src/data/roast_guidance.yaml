@@ -1,0 +1,106 @@
+# Architecture docs: src/content/roasts/CLAUDE.md
+#
+# Universal roast science — model-agnostic.
+# Machine-specific guidance (profiles, weight settings, program times,
+# safety features) lives in data/machines/<model_key>.yaml.
+#
+# Sources:
+#   - Genuine Origin, "Roast Profiles 101" (DTR 16–20% target across origins)
+#   - Scott Rao, "The Coffee Roaster's Companion" (DTR > ~24% risks baking)
+#   - Sweet Maria's roast color guide (loss % per level)
+#   - Scott Rao, "Resting Roasts: Is Fresher Better?" (rest_days; drum roasters
+#     need far less rest than air roasters — 1–2 days unless underdeveloped)
+#
+# rest_days assumes a DRUM roaster (Behmor) brewed by FILTER methods.
+# Espresso needs longer rest because CO₂ has nowhere to escape under pressure
+# and causes channeling — add ~5–7 days to the upper bound for espresso.
+#
+# These are starting points. Calibrate against your own logged batches.
+
+levels:
+  - name: light
+    loss_pct: [12, 14]
+    dtr_pct: [16, 19]
+    rest_days: [1, 10]
+    drop_temp_f: [405, 415]
+    drop: "15–45s after FC starts, before any oil sheen"
+    flavor: "Bright acidity, floral/fruit forward, origin-distinct"
+  - name: light-medium
+    loss_pct: [13, 15]
+    dtr_pct: [17, 20]
+    rest_days: [1, 7]
+    drop_temp_f: [415, 425]
+    drop: "30–60s into development, before FC fully winds down"
+    flavor: "Balanced acidity, sweetness emerging, origin still legible"
+  - name: medium
+    loss_pct: [14, 16]
+    dtr_pct: [18, 22]
+    rest_days: [1, 5]
+    drop_temp_f: [425, 435]
+    drop: "End of FC through 1:30–2:30 of development, before SC"
+    flavor: "Caramel / cocoa, balanced body, low acidity"
+  - name: medium-dark
+    loss_pct: [16, 18]
+    dtr_pct: [19, 23]
+    rest_days: [1, 4]
+    drop_temp_f: [435, 445]
+    drop: "First few snaps of second crack"
+    flavor: "Roasty notes appearing, body forward, less origin character"
+  - name: dark
+    loss_pct: [18, 20]
+    dtr_pct: [20, 24]
+    rest_days: [0, 2]
+    drop_temp_f: [446, 470]
+    drop: "Rolling SC, before oil floods the surface"
+    flavor: "Smoke / spice / bitter, body dominant"
+
+formulas:
+  - name: Weight loss %
+    formula: "(green_weight_g − roasted_weight_g) / green_weight_g × 100"
+    purpose: "Rough roast-development proxy. Heavier loss = more developed."
+  - name: Development time
+    formula: "total_time − time_to_fc"
+    purpose: "How long the bean spent post-first-crack. Drives sweetness and body."
+  - name: DTR (development time ratio) %
+    formula: "development_time / total_time × 100"
+    purpose: "Share of the roast in development. Genuine Origin targets 16–20%; > ~24% risks baked / flat cup (Rao)."
+
+# 50/30/20 phase split — drying / Maillard / development as % of total roast time.
+# Boundaries: drying = start → dry end (beans yellow, ~150°C); Maillard = dry end
+# → first crack (~196°C); development = first crack → drop (this % equals DTR).
+# A widely-cited heuristic (variants like 45/35/20 exist), not a setpoint — a
+# roast is "on profile" within ±tolerance_pct of each target. Requires a logged
+# `time_to_dry_end` to compute.
+phase_targets:
+  drying: 50
+  maillard: 30
+  development: 20
+  tolerance_pct: 5
+
+# Bean-temperature landmarks for the phase transitions, plus per-level drop temps
+# (`drop_temp_f` on each level above). These are BEAN temps from probe-roaster
+# literature — NOT the Behmor's A/B readings. The Behmor B-temp is a chamber/exhaust
+# reading that self-limits ~310–314°F and is explicitly "not a bean temp" (manual);
+# at FC the Behmor reads ~290–300°F while the bean is actually ~385–401°F. So you
+# CANNOT match these numbers on the Behmor — roast by EVENTS (yellowing, FC/2C
+# sound) and the ~300°F band. The temps are for understanding what's happening (and
+# if a bean probe / different machine is ever used). bean_c / bean_f are [lo, hi]
+# ranges (equal lo/hi = a point value). Sources: Perfect Daily Grind (bean temp &
+# roast curve), Sweet Maria's (degree of roast), MTPak (first/second crack), Scott Rao.
+phase_temps:
+  - event: Charge
+    bean_c: [191, 218]
+    bean_f: [375, 425]
+    note: "Drum/charge temp at drop-in. Cooler (160–190°C / 320–375°F) for slow/light styles."
+  - event: Dry end (yellowing)
+    bean_c: [150, 150]
+    bean_f: [300, 302]
+    note: "Green → yellow, hay → bread. Drying → Maillard boundary; aim ~5–6 min."
+  - event: First crack
+    bean_c: [196, 205]
+    bean_f: [385, 401]
+    note: "Maillard → development boundary. Sustained rhythmic popping."
+  - event: Second crack
+    bean_c: [220, 225]
+    bean_f: [428, 437]
+    note: "First snaps = Medium-dark drop / Behmor safe ceiling. Never past 10s in 2C."

@@ -1,0 +1,30 @@
+---
+import { roastGuidance } from "../lib/roastData";
+
+// Render a [lo, hi] range as "lo–hi unit", or just "lo unit" when lo === hi.
+const range = (r: [number, number], unit: string) =>
+  r[0] === r[1] ? `${r[0]}${unit}` : `${r[0]}–${r[1]}${unit}`;
+---
+
+<table class="roast-ref">
+  <thead>
+    <tr>
+      <th>Transition</th>
+      <th>Bean temp (°C)</th>
+      <th>Bean temp (°F)</th>
+      <th>What's happening</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      roastGuidance.phase_temps.map((p) => (
+        <tr>
+          <td><strong>{p.event}</strong></td>
+          <td>{range(p.bean_c, " °C")}</td>
+          <td>{range(p.bean_f, " °F")}</td>
+          <td>{p.note}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
