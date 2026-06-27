@@ -99,7 +99,7 @@ total_time: 14:00
 why_dropped: timing
 anything_weird: ''
 roasted_weight_g: 196.9
-roasted_photo: /media/2026-06-2715.47.412634806387466434011.jpg
+roasted_photo: /media/2026-06-2715.50.362586137694102651743.jpg
 rating: null
 tasting_notes: ''
 next_time: ''
