@@ -6,6 +6,7 @@ import Base from "../../layouts/Base.astro";
 import RoastHeadline from "../../components/RoastHeadline.astro";
 import PhaseBar from "../../components/PhaseBar.astro";
 import { computeRoastStats } from "../../lib/roastStats";
+import { withBase, withBaseHtml } from "../../lib/url";
 
 export async function getStaticPaths() {
   // Build draft detail pages in dev for preview, but not in prod.
@@ -39,7 +40,10 @@ const lossBadgeText = badgeText(stats.lossBadge, stats.lossPct, stats.targetLeve
 const dtrBadgeText = badgeText(stats.dtrBadge, stats.dtrPct, stats.targetLevel?.dtr_pct);
 
 // Render a long-form markdown frontmatter field to HTML (Hugo's `markdownify`).
-const md = (s?: string | null) => (s ? (marked.parse(s) as string) : "");
+// Root-relative links authored in the notes ("/roasts/...") are rewritten to the
+// deploy base so they survive a project-site sub-path.
+const md = (s?: string | null) =>
+  s ? withBaseHtml(marked.parse(s) as string) : "";
 
 // Source label: vendor name, else the product URL's hostname (mirrors single.html).
 const sourceLabel =
@@ -61,7 +65,7 @@ const hasLive =
 ---
 
 <Base title={d.title}>
-  <a class="back" href="/">← all roasts</a>
+  <a class="back" href={withBase("/")}>← all roasts</a>
   <h1>{d.title}</h1>
   <p class="meta">
     {d.date.toISOString().slice(0, 10)} · {d.target_level} · {d.roaster}

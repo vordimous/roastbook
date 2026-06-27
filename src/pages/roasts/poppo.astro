@@ -1,13 +1,14 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { poppo } from "../../lib/roastData";
+import { withBase } from "../../lib/url";
 
 const b = poppo.observed_baselines as Record<string, any>;
 const range = (r: unknown) => (Array.isArray(r) ? `${r[0]}–${r[1]}` : String(r ?? "—"));
 ---
 
 <Base title={`${poppo.name} — reference`}>
-  <a class="back" href="/">← roastbook</a>
+  <a class="back" href={withBase("/")}>← roastbook</a>
   <h1>{poppo.name} — reference</h1>
   <p class="lead">
     An air popcorn popper used by John &amp; Pamela as a small-batch coffee roaster.

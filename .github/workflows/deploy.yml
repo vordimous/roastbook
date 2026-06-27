@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+# Builds the Astro site and publishes it to GitHub Pages. Fork-ready: the base
+# path and origin are read from the Pages configuration at build time
+# (actions/configure-pages), so a fork at you/your-roastbook serves correctly at
+# https://you.github.io/your-roastbook/ with no edits to this file or the config.
+#
+# One-time setup in a fork: Settings → Pages → "Build and deployment" →
+# Source: "GitHub Actions". (See DEPLOY.md.)
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Permissions the Pages deploy needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; let a newer push supersede an in-flight run.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build
+        run: pnpm build
+        env:
+          # base_path is "/<repo>" for a project site, "" for a user/org site or
+          # custom domain; astro.config falls back to "/" when empty.
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

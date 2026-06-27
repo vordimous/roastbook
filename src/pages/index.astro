@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import { computeRoastStats } from "../lib/roastStats";
+import { withBase } from "../lib/url";
 
 // Drafts are visible in dev (and the CMS preview) but excluded from prod builds.
 const roasts = (await getCollection("roasts"))
@@ -19,16 +20,16 @@ const roasts = (await getCollection("roasts"))
   </p>
 
   <p class="guides">
-    <a href="/roasts/methods/">→ Methods &amp; reference</a>
+    <a href={withBase("/roasts/methods/")}>→ Methods &amp; reference</a>
     <span class="guides-hint">how the numbers are computed</span>
     <br />
-    <a href="/roasts/behmor-2000ab/">→ Behmor 2000 AB Plus</a>
+    <a href={withBase("/roasts/behmor-2000ab/")}>→ Behmor 2000 AB Plus</a>
     <span class="guides-hint">drum-roaster cheat sheet</span>
     <br />
-    <a href="/roasts/poppo/">→ Poppo (air popper)</a>
+    <a href={withBase("/roasts/poppo/")}>→ Poppo (air popper)</a>
     <span class="guides-hint">observed air-popper baselines</span>
     <br />
-    <a href="/roasts/behmor-video-notes/">→ Behmor video notes</a>
+    <a href={withBase("/roasts/behmor-video-notes/")}>→ Behmor video notes</a>
     <span class="guides-hint">community technique breakdown</span>
   </p>
 
@@ -36,7 +37,7 @@ const roasts = (await getCollection("roasts"))
     {
       roasts.map(({ entry: r, stats }) => (
         <li class="roast-item">
-          <a class="roast-link" href={`/roasts/${r.id}/`}>
+          <a class="roast-link" href={withBase(`/roasts/${r.id}/`)}>
             <span class="roast-title">
               {r.data.title}
               {r.data.draft && <span class="draft-badge">draft</span>}
