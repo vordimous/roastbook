@@ -5,77 +5,112 @@ interface Props {
 }
 const { stats } = Astro.props;
 const dash = "—";
+
+const cells = [
+  { label: "FC", value: stats.fc ?? dash },
+  { label: "Total", value: stats.total ?? dash },
+  { label: "Dev", value: stats.dev ?? dash },
+  { label: "DTR", value: stats.dtrPct != null ? `${stats.dtrPct}%` : dash },
+  { label: "Loss", value: stats.lossPct != null ? `${stats.lossPct}%` : dash },
+];
+
+// Left-side label for the ready strip, per rest-window status.
+const READY_LABEL: Record<string, string> = {
+  resting: "Resting — almost ready",
+  ready: "Ready to drink",
+  "past-peak": "Past peak",
+};
+const readyLabel = stats.ready ? READY_LABEL[stats.ready.status] : "";
 ---
 
-<section class="roast-headline">
-  <div class="roast-headline-stats">
-    <div class="hstat"><span class="hstat-label">FC</span><span class="hstat-value">{stats.fc ?? dash}</span></div>
-    <div class="hstat"><span class="hstat-label">Total</span><span class="hstat-value">{stats.total ?? dash}</span></div>
-    <div class="hstat"><span class="hstat-label">Dev</span><span class="hstat-value">{stats.dev ?? dash}</span></div>
-    <div class="hstat"><span class="hstat-label">DTR</span><span class="hstat-value">{stats.dtrPct != null ? `${stats.dtrPct}%` : dash}</span></div>
-    <div class="hstat"><span class="hstat-label">Loss</span><span class="hstat-value">{stats.lossPct != null ? `${stats.lossPct}%` : dash}</span></div>
-  </div>
+<div class="readout">
   {
-    stats.ready && (
-      <div class="roast-ready">
-        <div class="roast-ready-main">
-          <span class="hstat-label">Ready to drink</span>
-          <span class="hstat-value">{stats.ready.text}</span>
-          <span class={`roast-status roast-status-${stats.ready.status}`}>{stats.ready.status}</span>
-        </div>
-        <div class="roast-ready-detail">{stats.ready.detail}</div>
+    cells.map((c) => (
+      <div class="cell">
+        <div class="cell-label">{c.label}</div>
+        <div class="cell-value">{c.value}</div>
       </div>
-    )
+    ))
   }
-</section>
+</div>
+
+{
+  stats.ready && (
+    <div class="ready-strip">
+      <div class="ready-left">
+        <span class={`dot-status ${stats.ready.status}`} />
+        <span class="ready-text">
+          {readyLabel}
+          <span class="ready-detail"> · {stats.ready.detail}</span>
+        </span>
+      </div>
+      <div class="ready-window metric">{stats.ready.text}</div>
+    </div>
+  )
+}
 
 <style>
-  .roast-headline {
-    margin: 1em 0 1.5em;
-    padding: 0.9em 1.1em;
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
+  /* 5-up instrument readout: hairline-separated tiles over a line-soft bg. */
+  .readout {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 22px;
+  }
+  .cell {
+    background: var(--surface-2);
+    padding: 16px 14px;
+  }
+  .cell-label {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .cell-value {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+    margin-top: 5px;
+  }
+
+  .ready-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 13px 16px;
+    border: 1px solid var(--line-soft);
     border-radius: 8px;
   }
-  .roast-headline-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 0.5em 1.25em;
-  }
-  .hstat { display: flex; flex-direction: column; gap: 0.15em; }
-  .hstat-label {
-    font-size: 0.7em;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    font-weight: 600;
-  }
-  .hstat-value {
-    font-size: 1.35em;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-  .roast-ready {
-    margin-top: 0.85em;
-    padding-top: 0.85em;
-    border-top: 1px solid var(--border);
+  .ready-left {
     display: flex;
-    flex-direction: column;
-    gap: 0.2em;
+    align-items: center;
+    gap: 9px;
   }
-  .roast-ready-main { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6em; }
-  .roast-ready-detail { font-size: 0.85em; color: var(--muted); }
-  .roast-status {
-    display: inline-block;
-    padding: 0.15em 0.65em;
-    border-radius: 999px;
-    font-size: 0.75em;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  .ready-text {
+    font-size: 13px;
+    color: var(--muted);
   }
-  .roast-status-resting { background: #fff3cd; color: #856404; }
-  .roast-status-ready { background: #c8e6c9; color: #1b5e20; }
-  .roast-status-past-peak { background: #f8d7da; color: #721c24; }
+  .ready-detail {
+    color: var(--dim);
+  }
+  .ready-window {
+    font-size: 13px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .readout {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
 </style>

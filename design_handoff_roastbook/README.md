@@ -176,8 +176,31 @@ Everything else is rendered from Markdown front-matter / computed fields at buil
   ready window).
 - Index needs the roast collection sorted as today (newest/grouped as the current site does).
 
+## Roast photos (bean closeup, one per roast)
+The author keeps one closeup photo of the bean pile per roast. It doubles as the **real roast-color
+reference** alongside the target-level swatch, so it earns its place. Two placements (both shown in
+the prototype as striped placeholders labeled `bean closeup`):
+- **Detail page — "specimen" plate:** a `148×148`, radius-6 framed square at the **top-right of the
+  header**, sitting beside the title/meta block (header becomes a flex: title column `flex:1` + photo
+  `flex:0 0 auto`). Caption under it: mono 9px `--dim`, `SPECIMEN · <roast number>`. `object-fit:cover`.
+- **Index — row thumbnail:** a `26×26`, radius-4 thumbnail as the **first column** of each roast row
+  (grid gains a leading `30px` track; header gets a matching empty label cell). `object-fit:cover`,
+  `1px solid --line` frame. Keep it small so the ledger stays scannable.
+
+**Where the files go / how to wire it (tell Claude this):**
+- Store images alongside content, e.g. `content/roasts/015-nicaragua/beans.jpg` (co-located with the
+  roast's Markdown) **or** a flat `static/roasts/015.jpg` — match whatever the generator already does
+  for page assets.
+- Add an optional front-matter field, e.g. `photo: beans.jpg` (or `bean_photo:`). Resolve it relative
+  to the roast page. If absent, render the **striped placeholder**, not a broken image.
+- Same image source feeds both the detail specimen and the index thumbnail (CSS `object-fit:cover`
+  handles the two crops). Provide `alt` like `"015 — roasted beans closeup"`.
+- Nice-to-have: lazy-load (`loading="lazy"`) the index thumbnails.
+
 ## Assets
-- **Fonts:** IBM Plex Serif / Sans / Mono via Google Fonts (or self-host). No other image assets.
+- **Fonts:** IBM Plex Serif / Sans / Mono via Google Fonts (or self-host).
+- **Roast photos:** author-supplied bean-closeup JPGs, one per roast (see section above). The prototype
+  shows placeholders; swap in `<img object-fit:cover>` driven by front-matter.
 - **Icons:** none — the only glyphs are text arrows (`→`, `←`) and CSS dots/swatches. Do not add an icon library.
 - **Charts:** hand-built inline SVG (formula above); no charting dependency required.
 

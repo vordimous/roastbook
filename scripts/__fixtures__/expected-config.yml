@@ -13,6 +13,8 @@ collections:
     create: true
     extension: md
     format: frontmatter
+    media_folder: ../../assets/roasts
+    public_folder: ../../assets/roasts
     fields:
       - name: title
         label: Title

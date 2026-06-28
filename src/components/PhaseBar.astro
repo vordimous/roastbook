@@ -5,103 +5,129 @@ interface Props {
 }
 const { phases } = Astro.props;
 
+// Phase fill colors — drawn from the roast-level scale + the accent (data key).
 const COLOR: Record<Phase["name"], string> = {
-  Drying: "#6aaed6",
-  Maillard: "#d6a36a",
-  Development: "#b8553b",
+  Drying: "var(--level-light)",
+  Maillard: "var(--level-medium)",
+  Development: "var(--accent)",
 };
-const label = phases.map((p) => `${p.name} ${p.pct}%`).join(", ");
+
+// Target ticks: cumulative drying% and drying%+maillard% (50 and 80 for 50/30/20).
+const t0 = phases[0]?.target ?? 0;
+const t1 = t0 + (phases[1]?.target ?? 0);
+
 const deltaText = (p: Phase) => {
   const d = Math.round((p.pct - p.target) * 10) / 10;
-  return d === 0 ? "on target" : `${d > 0 ? "+" : ""}${d} pt vs ${p.target}%`;
+  return d === 0 ? "on target" : `${d > 0 ? "+" : ""}${d} pt vs target`;
 };
+const label = phases.map((p) => `${p.name} ${p.pct}%`).join(", ");
 ---
 
 <section class="phases">
-  <h3 class="roast-facts-subtitle">Phase split <span class="vs">vs 50/30/20</span></h3>
+  <div class="phases-head">
+    <span class="section-label">Phase split vs 50 / 30 / 20</span>
+    <span class="phases-hint metric">your roast</span>
+  </div>
 
-  <div class="bar actual" role="img" aria-label={`Roast phases: ${label}`}>
+  <div class="bar" role="img" aria-label={`Roast phases: ${label}`}>
+    <div class="track">
+      {phases.map((p) => (
+        <div class="seg" style={`width:${p.pct}%;background:${COLOR[p.name]}`} />
+      ))}
+    </div>
+    <span class="tick" style={`left:${t0}%`}></span>
+    <span class="tick" style={`left:${t1}%`}></span>
+  </div>
+
+  <div class="legend">
     {
       phases.map((p) => (
-        <div class="seg" style={`width:${p.pct}%;background:${COLOR[p.name]}`}>
-          <span>{p.pct}%</span>
+        <div class="leg">
+          <div class="leg-name">
+            <span class="leg-swatch" style={`background:${COLOR[p.name]}`} />
+            {p.name}
+          </div>
+          <div class="leg-val metric">{p.mmss} · {p.pct}%</div>
+          <div class="leg-delta metric">{deltaText(p)}</div>
         </div>
       ))
     }
   </div>
-  <div class="bar target" aria-hidden="true">
-    {
-      phases.map((p) => (
-        <div class="seg" style={`width:${p.target}%;background:${COLOR[p.name]}`}>
-          <span>{p.target}%</span>
-        </div>
-      ))
-    }
-  </div>
-  <div class="bar-labels"><span>your roast</span><span>50/30/20 target</span></div>
-
-  <dl class="phase-legend">
-    {
-      phases.map((p) => (
-        <div>
-          <dt><span class="swatch" style={`background:${COLOR[p.name]}`} />{p.name}</dt>
-          <dd>
-            {p.mmss} · {p.pct}%
-            <span class={`badge ${p.badge}`}>{deltaText(p)}</span>
-          </dd>
-        </div>
-      ))
-    }
-  </dl>
 </section>
 
 <style>
-  .phases { margin: 1em 0 0; }
-  .vs { font-weight: 400; opacity: 0.6; font-size: 0.85em; }
-  .bar {
-    display: flex;
-    width: 100%;
-    height: 1.9em;
-    border-radius: 5px;
-    overflow: hidden;
+  .phases {
+    margin-top: 26px;
   }
-  .bar.target { margin-top: 0.25em; opacity: 0.45; height: 1.2em; }
-  .seg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #1a1a1a;
-    font-size: 0.75em;
-    font-weight: 600;
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  .bar-labels {
+  .phases-head {
     display: flex;
     justify-content: space-between;
-    font-size: 0.72em;
-    color: var(--muted);
-    margin-top: 0.2em;
+    align-items: baseline;
+    margin-bottom: 12px;
   }
-  .phase-legend {
+  .phases-hint {
+    font-size: 10.5px;
+    color: var(--dim);
+  }
+
+  .bar {
+    position: relative;
+    height: 30px;
+  }
+  .track {
+    display: flex;
+    height: 100%;
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .seg {
+    min-width: 0;
+  }
+  .tick {
+    position: absolute;
+    top: -3px;
+    height: 36px;
+    width: 1.5px;
+    background: var(--text);
+    opacity: 0.55;
+    transform: translateX(-0.75px);
+  }
+
+  .legend {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.3em 1em;
-    margin: 0.75em 0 0;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 12px;
   }
-  .phase-legend > div { display: flex; gap: 0.5em; align-items: baseline; flex-wrap: wrap; }
-  .phase-legend dt { font-weight: 600; display: flex; align-items: center; gap: 0.4em; margin: 0; }
-  .phase-legend dd { margin: 0; }
-  .swatch { width: 0.8em; height: 0.8em; border-radius: 2px; display: inline-block; }
-  .badge {
-    font-size: 0.72em;
-    padding: 0.1em 0.45em;
-    border-radius: 3px;
-    margin-left: 0.3em;
-    white-space: nowrap;
+  .leg-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text);
   }
-  .badge.ok { background: #c8e6c9; color: #1b5e20; }
-  .badge.under { background: #fff3cd; color: #856404; }
-  .badge.over { background: #f8d7da; color: #721c24; }
+  .leg-swatch {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+  .leg-val {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  .leg-delta {
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+
+  @media (max-width: 560px) {
+    .legend {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
 </style>

@@ -1,11 +1,14 @@
 ---
+import { withBase } from "../lib/url";
+
 interface Props {
   title?: string;
   frontmatter?: { title?: string };
 }
 // Used directly (title prop) and as an MDX page layout (frontmatter.title).
 const { title, frontmatter } = Astro.props;
-const pageTitle = title ?? frontmatter?.title ?? "roastbook";
+const pageTitle = title ?? frontmatter?.title ?? "Roastbook";
+const home = withBase("/");
 ---
 
 <!doctype html>
@@ -14,55 +17,320 @@ const pageTitle = title ?? frontmatter?.title ?? "roastbook";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    {/* Set the theme before first paint to avoid a flash. */}
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem("theme");
+        const theme =
+          saved ||
+          (matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark");
+        const root = document.documentElement;
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
+      })();
+    </script>
   </head>
   <body>
-    <slot />
+    <div class="page">
+      <div class="card">
+        <header class="topbar">
+          <a class="wordmark" href={home}>Roastbook<span class="dot">.</span></a>
+          <div class="theme-switch">
+            <span class="theme-label">THEME</span>
+            <div class="theme-pill" role="group" aria-label="Theme">
+              <button class="theme-seg" type="button" data-theme="dark">dark</button>
+              <button class="theme-seg" type="button" data-theme="light">light</button>
+            </div>
+          </div>
+        </header>
+        <div class="card-body">
+          <slot />
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const segs = Array.from(document.querySelectorAll(".theme-seg"));
+        const reflect = (t) => {
+          for (const b of segs) {
+            const active = b.dataset.theme === t;
+            b.classList.toggle("is-active", active);
+            b.setAttribute("aria-pressed", String(active));
+          }
+        };
+        reflect(root.dataset.theme);
+        for (const b of segs) {
+          b.addEventListener("click", () => {
+            const t = b.dataset.theme;
+            root.dataset.theme = t;
+            root.style.colorScheme = t;
+            localStorage.setItem("theme", t);
+            reflect(t);
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
 
 <style is:global>
+  /* ---- Design tokens (dark primary; [data-theme="light"] flips to paper) ---- */
+  :root,
+  :root[data-theme="dark"] {
+    --ink: #15130f;
+    --surface: #1e1b16;
+    --surface-2: #1a1712;
+    --line: #322c22;
+    --line-soft: #262219;
+    --hair: #1d1a15;
+    --text: #ece6da;
+    --muted: #a39a88;
+    --dim: #6e665a;
+    --accent: #dd6b33;
+    --row-hover: #1a1712;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --border-lift: #4a4234;
+    --sep: #4a4234;
+    --dot-ready: #ece6da;
+    --dot-resting-ring: #8a8073;
+    --dot-past-ring: #5a5247;
+  }
+
+  :root[data-theme="light"] {
+    --ink: #ece7dc;
+    --surface: #f4f0e6;
+    --surface-2: #f0ebdf;
+    --line: #d8d1c2;
+    --line-soft: #ddd6c7;
+    --hair: #e2dbcc;
+    --text: #2a2620;
+    --muted: #6e665a;
+    --dim: #9a917f;
+    --accent: #b5511f;
+    --row-hover: #e7e0d2;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --border-lift: #c9c0ad;
+    --sep: #c9c0ad;
+    --dot-ready: #5a5247;
+    --dot-resting-ring: #9a917f;
+    --dot-past-ring: #c2baa8;
+  }
+
+  /* Roast-level scale — DATA KEY ONLY (swatches, phase bars). Never UI chrome. */
   :root {
-    color-scheme: light dark;
-    --border: rgba(127, 127, 127, 0.3);
-    --bg-alt: rgba(127, 127, 127, 0.06);
-    --muted: #888;
+    --level-light: #c9a36b;
+    --level-med-light: #b07d43;
+    --level-medium: #8a5a2b;
+    --level-med-dark: #5e3a1e;
+    --level-dark: #3a2415;
+
+    --font-serif: "IBM Plex Serif", Georgia, serif;
+    --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   body {
-    font: 16px/1.6 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    max-width: 820px;
-    margin: 2rem auto;
-    padding: 0 1.25rem;
+    margin: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
   }
   a {
-    color: #3b82f6;
+    color: var(--accent);
+    text-decoration: none;
   }
-  h1 {
-    margin-bottom: 0.25rem;
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
   }
-  table {
-    border-collapse: collapse;
-    margin: 1rem 0;
+  .card {
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
   }
-  th,
-  td {
-    border: 1px solid var(--border);
-    padding: 0.4rem 0.7rem;
-    text-align: left;
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--line-soft);
   }
-  pre {
-    background: var(--bg-alt);
+  .wordmark {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .wordmark .dot {
+    color: var(--accent);
+  }
+  .theme-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .theme-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+  }
+  .theme-pill {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .theme-seg {
+    padding: 4px 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .theme-seg.is-active {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .card-body {
+    padding: 26px 30px 30px;
+  }
+
+  /* Shared primitives */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .metric {
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+
+  /* Quiet status dots (no color, both themes) */
+  .dot-status {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+  .dot-status.ready {
+    background: var(--dot-ready);
+  }
+  .dot-status.resting {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--dot-resting-ring);
+  }
+  .dot-status.past-peak {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--dot-past-ring);
+  }
+
+  /* Long-form markdown (roast notes, guide pages) */
+  .prose {
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 1.4em 0 0.5em;
+  }
+  .prose h1 {
+    font-size: 27px;
+  }
+  .prose h2 {
+    font-size: 20px;
+  }
+  .prose h3 {
+    font-size: 16px;
+  }
+  .prose p,
+  .prose ul,
+  .prose ol {
+    margin: 0.6em 0;
+  }
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  .prose pre {
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     overflow-x: auto;
   }
-  /* Reference tables on the guide pages (methods / machine). */
+  .prose pre code {
+    background: none;
+    padding: 0;
+  }
+  .prose a {
+    color: var(--accent);
+  }
+  .prose a:hover {
+    text-decoration: underline;
+  }
+
+  /* Tables (guide pages + any prose tables) */
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.92em;
+  }
+  th,
+  td {
+    border: 1px solid var(--line);
+    padding: 0.45rem 0.7rem;
+    text-align: left;
+  }
+  th {
+    background: var(--surface-2);
+    font-weight: 600;
+  }
   table.roast-ref {
     width: 100%;
-    font-size: 0.9rem;
-  }
-  table.roast-ref th {
-    background: var(--bg-alt);
-    font-weight: 600;
   }
   table.roast-ref code {
     font-size: 0.85em;

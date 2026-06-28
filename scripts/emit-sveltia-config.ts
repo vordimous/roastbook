@@ -277,10 +277,19 @@ function collectionFromAstro(name: string, collection: any) {
   // frontmatter fields, and an empty markdown body widget is just noise in the
   // editor. The detail page still renders a markdown body if one ever exists.
 
-  // NOTE: co-locating CMS uploads next to the entry (so Astro's image() resolves
-  // them) needs a per-collection media_folder, but the exact value Sveltia
-  // accepts must be verified in the browser. Left off for now — the Astro build
-  // pipeline already optimizes co-located images regardless of this setting.
+  // Per-collection media folder for collections with an image field. Astro's
+  // image() only optimizes images under src/ and resolves the frontmatter value
+  // as a path RELATIVE TO THE ENTRY FILE — so a /public path can't be processed.
+  // A *relative* collection media_folder/public_folder makes Sveltia store
+  // uploads in the centralized src/assets/<name> folder and write the entry-
+  // relative path image() needs (e.g. "../../assets/roasts/foo.jpg"). The path
+  // is resolved from the entry's folder (src/content/<name>/), so "../../assets"
+  // climbs out of src/content/ into src/assets/.
+  const hasImageField = fields.some((f) => f.widget === "image");
+  const media = hasImageField
+    ? { media_folder: `../../assets/${name}`, public_folder: `../../assets/${name}` }
+    : {};
+
   return {
     name,
     label: labelize(name),
@@ -288,6 +297,7 @@ function collectionFromAstro(name: string, collection: any) {
     create: true,
     extension: "md",
     format: "frontmatter",
+    ...media,
     fields,
   };
 }
