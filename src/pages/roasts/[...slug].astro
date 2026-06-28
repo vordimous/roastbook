@@ -5,7 +5,9 @@ import { marked } from "marked";
 import Base from "../../layouts/Base.astro";
 import RoastHeadline from "../../components/RoastHeadline.astro";
 import PhaseBar from "../../components/PhaseBar.astro";
+import TempCurve from "../../components/TempCurve.astro";
 import { computeRoastStats } from "../../lib/roastStats";
+import { parseRoastTitle, levelColor } from "../../lib/roastDisplay";
 import { withBase, withBaseHtml } from "../../lib/url";
 
 export async function getStaticPaths() {
@@ -24,6 +26,7 @@ const { Content } = await render(entry);
 const d = entry.data;
 
 const stats = computeRoastStats(d);
+const parsed = parseRoastTitle(d.title);
 
 // "in range" / "under by X%" / "over by X%" label for a computed value.
 const round1 = (n: number) => Math.round(Math.abs(n) * 10) / 10;
@@ -34,7 +37,7 @@ function badgeText(
 ): string | null {
   if (!badge || val == null || !range) return null;
   if (badge === "ok") return "in range";
-  return badge === "under" ? `under by ${round1(range[0] - val)}%` : `over by ${round1(val - range[1])}%`;
+  return badge === "under" ? `under ${round1(range[0] - val)}%` : `over ${round1(val - range[1])}%`;
 }
 const lossBadgeText = badgeText(stats.lossBadge, stats.lossPct, stats.targetLevel?.loss_pct);
 const dtrBadgeText = badgeText(stats.dtrBadge, stats.dtrPct, stats.targetLevel?.dtr_pct);
@@ -45,195 +48,219 @@ const dtrBadgeText = badgeText(stats.dtrBadge, stats.dtrPct, stats.targetLevel?.
 const md = (s?: string | null) =>
   s ? withBaseHtml(marked.parse(s) as string) : "";
 
-// Source label: vendor name, else the product URL's hostname (mirrors single.html).
-const sourceLabel =
-  d.vendor ||
-  (d.product_url ? new URL(d.product_url).hostname.replace(/^www\./, "") : null);
+// --- Roast plan rows ------------------------------------------------------
+const conditions =
+  d.ambient_f != null || d.ambient_rh != null
+    ? [d.ambient_f != null ? `${d.ambient_f}°F` : null, d.ambient_rh != null ? `${d.ambient_rh}% RH` : null]
+        .filter(Boolean)
+        .join(" / ")
+    : null;
 
-const hasMeasured =
-  d.roasted_weight_g != null ||
-  d.time_to_fc ||
-  d.total_time ||
-  d.rating != null;
+const planRows: { k: string; v: string }[] = [
+  d.origin && { k: "Origin", v: d.origin },
+  d.process && { k: "Process", v: d.process },
+  { k: "Target", v: d.target_level },
+  { k: "Roaster", v: d.roaster },
+  d.profile && { k: "Profile", v: d.profile },
+  d.batch_size_g && { k: "Batch", v: `${d.batch_size_g} g` },
+  d.green_weight_g && { k: "Green weight", v: `${d.green_weight_g} g` },
+  conditions && { k: "Conditions", v: conditions },
+].filter(Boolean) as { k: string; v: string }[];
 
-const hasLive =
-  d.color_at_fc ||
-  d.smell_at_fc ||
-  d.interventions ||
-  d.why_dropped ||
-  d.anything_weird;
+// --- Target rows (from the level table) -----------------------------------
+const t = stats.targetLevel;
+const targetRows = t
+  ? [
+      { k: "Weight loss", v: `${t.loss_pct[0]}–${t.loss_pct[1]}%` },
+      { k: "DTR", v: `${t.dtr_pct[0]}–${t.dtr_pct[1]}%` },
+      { k: "Drop", v: t.drop },
+      { k: "Flavor", v: t.flavor },
+    ]
+  : [];
+
+// --- Measured rows (with delta chips) -------------------------------------
+const measuredRows = [
+  d.roasted_weight_g && { k: "Roasted", v: `${d.roasted_weight_g} g`, delta: null },
+  stats.lossPct != null && { k: "Weight loss", v: `${stats.lossPct}%`, delta: lossBadgeText },
+  stats.dev && { k: "Dev time", v: stats.dev, delta: null },
+  stats.dtrPct != null && { k: "DTR", v: `${stats.dtrPct}%`, delta: dtrBadgeText },
+].filter(Boolean) as { k: string; v: string; delta: string | null }[];
+
+// --- Timing + live-note rows ----------------------------------------------
+const timingRows = [
+  d.time_to_dry_end && { k: "Dry end", v: d.time_to_dry_end },
+  d.time_to_fc && { k: "First crack", v: d.time_to_fc },
+  d.total_time && { k: "Drop", v: d.total_time },
+].filter(Boolean) as { k: string; v: string }[];
+
+const noteRows = [
+  d.color_at_fc && { k: "Color at FC", v: d.color_at_fc },
+  d.smell_at_fc && { k: "Smell at FC", v: d.smell_at_fc },
+  d.why_dropped && { k: "Why dropped", v: d.why_dropped },
+].filter(Boolean) as { k: string; v: string }[];
+
+// --- Long-form prose sections ---------------------------------------------
+const sections = [
+  d.bean_notes && { label: "Bean-specific notes", html: md(d.bean_notes) },
+  d.playbook && { label: "Today's playbook", html: md(d.playbook) },
+  d.anything_weird && { label: "Anything weird", html: md(d.anything_weird) },
+  d.tasting_notes && { label: "Tasting notes", html: md(d.tasting_notes) },
+  d.next_time && { label: "What to change next time", html: md(d.next_time) },
+].filter(Boolean) as { label: string; html: string }[];
 ---
 
 <Base title={d.title}>
-  <a class="back" href={withBase("/")}>← all roasts</a>
-  <h1>{d.title}</h1>
-  <p class="meta">
-    {d.date.toISOString().slice(0, 10)} · {d.target_level} · {d.roaster}
-  </p>
+  <a class="back metric" href={withBase("/")}>← all roasts</a>
 
-  {stats.hasMeasurements && <RoastHeadline stats={stats} />}
+  <div class="detail-header">
+    <div class="detail-header-main">
+      <h1 class="detail-title">
+        {parsed.num && <span class="num">{parsed.num} — </span>}{parsed.name}
+        {parsed.qualifier && <span class="qual">({parsed.qualifier})</span>}
+      </h1>
 
-  {
-    d.roasted_photo && (
-      <section class="roast-photo-section">
-        <figure>
-          <Image
-            src={d.roasted_photo}
-            alt={`Cooled, roasted beans for ${d.title}`}
-            widths={[480, 720, 1080]}
-            sizes="(max-width: 720px) 100vw, 720px"
-            loading="lazy"
-            class="roast-photo"
-          />
-          <figcaption>Roasted beans — color reference</figcaption>
-        </figure>
-      </section>
-    )
-  }
-
-  <section class="roast-facts">
-    <h2 class="roast-facts-title">Roast plan</h2>
-    <div class="roast-facts-grid">
-      {d.origin && <div><dt>Origin</dt><dd>{d.origin}</dd></div>}
-      {d.process && <div><dt>Process</dt><dd>{d.process}</dd></div>}
-      {
-        d.product_url && (
-          <div>
-            <dt>Source</dt>
-            <dd>
-              <a href={d.product_url} target="_blank" rel="noopener">
-                {sourceLabel}
-              </a>
-            </dd>
-          </div>
-        )
-      }
-      <div><dt>Target level</dt><dd>{d.target_level}</dd></div>
-      <div><dt>Roaster</dt><dd>{d.roaster}</dd></div>
-      {d.profile && <div><dt>Profile</dt><dd>{d.profile}</dd></div>}
-      {d.batch_size_g && <div><dt>Batch size</dt><dd>{d.batch_size_g} g</dd></div>}
-      {d.weight_setting && <div><dt>Weight setting</dt><dd>{d.weight_setting}</dd></div>}
-      {d.green_weight_g && <div><dt>Green weight</dt><dd>{d.green_weight_g} g</dd></div>}
-      {
-        (d.ambient_f != null || d.ambient_rh != null) && (
-          <div>
-            <dt>Conditions</dt>
-            <dd>
-              {d.ambient_f != null && `${d.ambient_f}°F`}
-              {d.ambient_f != null && d.ambient_rh != null && " / "}
-              {d.ambient_rh != null && `${d.ambient_rh}% RH`}
-            </dd>
-          </div>
-        )
-      }
+      <div class="meta metric">
+        <span>{d.date.toISOString().slice(0, 10)}</span>
+        <span class="sep">·</span>
+        <span class="meta-level">
+          <span class="swatch" style={`background:${levelColor(d.target_level)}`} />
+          {d.target_level}
+        </span>
+        <span class="sep">·</span>
+        <span>{d.roaster}</span>
+      </div>
     </div>
 
     {
-      stats.targetLevel && (
-        <>
-          <h3 class="roast-facts-subtitle">Targets for <em>{d.target_level}</em></h3>
-          <div class="roast-facts-grid">
-            <div><dt>Weight loss</dt><dd>{stats.targetLevel.loss_pct[0]}–{stats.targetLevel.loss_pct[1]}%</dd></div>
-            <div><dt>DTR</dt><dd>{stats.targetLevel.dtr_pct[0]}–{stats.targetLevel.dtr_pct[1]}%</dd></div>
-            <div class="span2"><dt>Drop trigger</dt><dd>{stats.targetLevel.drop}</dd></div>
-            <div class="span2"><dt>Flavor goal</dt><dd>{stats.targetLevel.flavor}</dd></div>
-          </div>
-        </>
+      d.roasted_photo && (
+        <figure class="specimen">
+          <Image
+            class="specimen-img"
+            src={d.roasted_photo}
+            width={296}
+            height={296}
+            alt={`Cooled, roasted beans for ${d.title}`}
+            loading="eager"
+          />
+          <figcaption class="specimen-cap metric">
+            Specimen{parsed.num ? ` · ${parsed.num}` : ""}
+          </figcaption>
+        </figure>
       )
     }
+  </div>
+
+  {stats.hasMeasurements && <RoastHeadline stats={stats} />}
+
+  <div class="two-col">
+    <div>
+      <div class="section-label">Roast plan</div>
+      <div class="kv">
+        {planRows.map((r) => (
+          <div class="kv-row">
+            <span class="kv-k">{r.k}</span>
+            <span class="kv-v">{r.v}</span>
+          </div>
+        ))}
+      </div>
+    </div>
 
     {
-      hasMeasured && (
-        <>
-          <h3 class="roast-facts-subtitle">Measured</h3>
-          <div class="roast-facts-grid">
-            {d.roasted_weight_g && <div><dt>Roasted</dt><dd>{d.roasted_weight_g} g</dd></div>}
-            {stats.lossPct != null && (
-              <div>
-                <dt>Weight loss</dt>
-                <dd>{stats.lossPct}% {stats.lossBadge && <span class={`badge ${stats.lossBadge}`}>{lossBadgeText}</span>}</dd>
+      (targetRows.length > 0 || measuredRows.length > 0) && (
+        <div>
+          {targetRows.length > 0 && (
+            <>
+              <div class="section-label">Targets — {d.target_level}</div>
+              <div class="kv">
+                {targetRows.map((r) => (
+                  <div class="kv-row">
+                    <span class="kv-k">{r.k}</span>
+                    <span class="kv-v metric">{r.v}</span>
+                  </div>
+                ))}
               </div>
-            )}
-            {d.time_to_fc && <div><dt>Time to FC</dt><dd>{d.time_to_fc}</dd></div>}
-            {d.total_time && <div><dt>Total time</dt><dd>{d.total_time}</dd></div>}
-            {stats.dev && <div><dt>Dev time</dt><dd>{stats.dev}</dd></div>}
-            {stats.dtrPct != null && (
-              <div>
-                <dt>DTR</dt>
-                <dd>{stats.dtrPct}% {stats.dtrBadge && <span class={`badge ${stats.dtrBadge}`}>{dtrBadgeText}</span>}</dd>
+            </>
+          )}
+          {measuredRows.length > 0 && (
+            <>
+              <div class="section-label measured-label">Measured</div>
+              <div class="kv">
+                {measuredRows.map((r) => (
+                  <div class="kv-row">
+                    <span class="kv-k">{r.k}</span>
+                    <span class="kv-measured">
+                      <span class="kv-v metric">{r.v}</span>
+                      {r.delta && <span class="delta metric">{r.delta}</span>}
+                    </span>
+                  </div>
+                ))}
               </div>
-            )}
-            {d.rating != null && <div><dt>Rating</dt><dd>{d.rating} / 10</dd></div>}
-          </div>
-        </>
+            </>
+          )}
+        </div>
       )
     }
+  </div>
 
-    {stats.phases && <PhaseBar phases={stats.phases} />}
-  </section>
+  {stats.phases && <PhaseBar phases={stats.phases} />}
+
+  <TempCurve log={d.interventions} fcTime={d.time_to_fc} />
 
   {
-    d.bean_notes && (
-      <section class="roast-section">
-        <h2>Bean-specific notes</h2>
-        <Fragment set:html={md(d.bean_notes)} />
+    (timingRows.length > 0 || noteRows.length > 0) && (
+      <div class="two-col timing-notes">
+        {timingRows.length > 0 && (
+          <div>
+            <div class="section-label">Timing</div>
+            <div class="kv">
+              {timingRows.map((r) => (
+                <div class="kv-row">
+                  <span class="kv-k muted">{r.k}</span>
+                  <span class="kv-v metric">{r.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {noteRows.length > 0 && (
+          <div>
+            <div class="section-label">Live notes</div>
+            <div class="kv">
+              {noteRows.map((r) => (
+                <div class="kv-row">
+                  <span class="kv-k">{r.k}</span>
+                  <span class="kv-v note-v">{r.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  {
+    d.interventions && (
+      <section class="block">
+        <div class="section-label">Button log — every press</div>
+        <pre class="button-log">{d.interventions}</pre>
       </section>
     )
   }
 
   {
-    d.playbook && (
-      <section class="roast-section">
-        <h2>Today's playbook</h2>
-        <Fragment set:html={md(d.playbook)} />
+    sections.map((s) => (
+      <section class="block">
+        <div class="section-label">{s.label}</div>
+        <div class="prose" set:html={s.html} />
       </section>
-    )
-  }
-
-  {
-    hasLive && (
-      <section class="roast-section">
-        <h2>Live notes</h2>
-        <dl class="roast-live">
-          {d.color_at_fc && <><dt>Color at FC</dt><dd>{d.color_at_fc}</dd></>}
-          {d.smell_at_fc && <><dt>Smell at FC</dt><dd>{d.smell_at_fc}</dd></>}
-          {
-            d.interventions && (
-              <>
-                <dt>Button log</dt>
-                <dd><pre class="roast-interventions">{d.interventions}</pre></dd>
-              </>
-            )
-          }
-          {d.why_dropped && <><dt>Why dropped</dt><dd><Fragment set:html={md(d.why_dropped)} /></dd></>}
-          {d.anything_weird && <><dt>Anything weird</dt><dd><Fragment set:html={md(d.anything_weird)} /></dd></>}
-        </dl>
-      </section>
-    )
-  }
-
-  {
-    d.tasting_notes && (
-      <section class="roast-section">
-        <h2>Tasting notes</h2>
-        <Fragment set:html={md(d.tasting_notes)} />
-      </section>
-    )
-  }
-
-  {
-    d.next_time && (
-      <section class="roast-section">
-        <h2>What to change next time</h2>
-        <Fragment set:html={md(d.next_time)} />
-      </section>
-    )
+    ))
   }
 
   {
     entry.body?.trim() && (
-      <section class="roast-section">
-        <Content />
+      <section class="block">
+        <div class="prose"><Content /></div>
       </section>
     )
   }
@@ -242,116 +269,165 @@ const hasLive =
 <style>
   .back {
     display: inline-block;
-    margin-bottom: 1rem;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 14px;
   }
-  .meta {
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-  }
-
-  .roast-photo-section {
-    margin: 1em 0 1.5em;
-  }
-  .roast-photo-section figure {
-    margin: 0;
+  .detail-header {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4em;
+    align-items: flex-start;
+    gap: 20px;
   }
-  .roast-photo {
-    max-width: min(100%, 720px);
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  .detail-header-main {
+    flex: 1;
+    min-width: 0;
   }
-  .roast-photo-section figcaption {
-    font-size: 0.85em;
-    color: var(--muted);
+  .specimen {
+    flex: 0 0 auto;
+    margin: 0;
     text-align: center;
   }
-
-  .roast-facts {
-    margin: 1.5em 0 2em;
-    padding: 1em 1.25em;
-    border: 1px solid var(--border);
+  .specimen-img {
+    width: 148px;
+    height: 148px;
+    object-fit: cover;
     border-radius: 6px;
-    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    display: block;
   }
-  .roast-facts-title {
-    margin: 0 0 0.5em;
-    font-size: 1.1em;
+  .specimen-cap {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 6px;
   }
-  .roast-facts-subtitle {
-    margin: 1em 0 0.5em;
-    font-size: 1em;
-    opacity: 0.85;
-  }
-  .roast-facts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.5em 1em;
-    margin: 0;
-  }
-  .roast-facts-grid > div {
-    display: flex;
-    gap: 0.4em;
-    align-items: baseline;
-    flex-wrap: wrap;
-  }
-  .roast-facts-grid > div.span2 {
-    grid-column: span 2;
-  }
-  .roast-facts-grid dt {
+  .detail-title {
+    font-family: var(--font-serif);
+    font-size: 27px;
     font-weight: 600;
-    opacity: 0.75;
+    line-height: 1.12;
     margin: 0;
   }
-  .roast-facts-grid dd {
-    margin: 0;
+  .detail-title .num {
+    color: var(--text);
   }
-  .badge {
-    font-size: 0.75em;
-    padding: 0.1em 0.45em;
-    border-radius: 3px;
-    margin-left: 0.3em;
+  .detail-title .qual {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .meta .sep {
+    color: var(--sep);
+  }
+  .meta-level {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-level .swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+  }
+
+  /* Two-column data sections */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+    margin-top: 26px;
+  }
+  .timing-notes {
+    grid-template-columns: 1.1fr 1fr;
+  }
+
+  .measured-label {
+    display: block;
+    margin-top: 18px;
+  }
+  .kv {
+    margin-top: 12px;
+  }
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .kv-k {
+    font-size: 12.5px;
+    color: var(--dim);
+    flex: 0 0 auto;
+  }
+  .kv-k.muted {
+    color: var(--muted);
+  }
+  .kv-v {
+    font-size: 12.5px;
+    color: var(--text);
+    text-align: right;
+  }
+  .note-v {
+    text-align: right;
+  }
+  .kv-measured {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .kv-measured .kv-v {
+    font-size: 13px;
+  }
+  .delta {
+    font-size: 10px;
+    color: var(--accent);
     white-space: nowrap;
   }
-  .badge.ok { background: #c8e6c9; color: #1b5e20; }
-  .badge.under { background: #fff3cd; color: #856404; }
-  .badge.over { background: #f8d7da; color: #721c24; }
 
-  .roast-section {
-    margin: 1.5em 0;
+  /* Long-form blocks */
+  .block {
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
   }
-  .roast-section h2 {
-    margin-bottom: 0.5em;
+  .block .prose {
+    margin-top: 10px;
   }
-  .roast-live {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 0.4em 1em;
-    margin: 0;
-  }
-  .roast-live dt {
-    font-weight: 600;
-    opacity: 0.75;
-  }
-  .roast-live dd {
-    margin: 0;
-  }
-  .roast-interventions {
-    margin: 0;
-    padding: 0.6em 0.8em;
-    background: var(--bg-alt);
-    border-left: 3px solid var(--muted);
-    border-radius: 0 4px 4px 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.85em;
-    line-height: 1.45;
+  .button-log {
+    margin: 10px 0 0;
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--muted);
     white-space: pre-wrap;
     overflow-x: auto;
+  }
+
+  @media (max-width: 560px) {
+    .two-col,
+    .timing-notes {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .detail-header {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      gap: 14px;
+    }
   }
 </style>

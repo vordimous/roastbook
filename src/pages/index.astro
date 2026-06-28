@@ -1,136 +1,322 @@
 ---
 import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import { computeRoastStats } from "../lib/roastStats";
 import { withBase } from "../lib/url";
+import {
+  parseRoastTitle,
+  shortProcess,
+  levelColor,
+  fmtMonthDay,
+} from "../lib/roastDisplay";
 
 // Drafts are visible in dev (and the CMS preview) but excluded from prod builds.
 const roasts = (await getCollection("roasts"))
   .filter((r) => !import.meta.env.PROD || !r.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .map((r) => ({ entry: r, stats: computeRoastStats(r.data) }));
+  .map((r) => {
+    const parsed = parseRoastTitle(r.data.title);
+    const sub = [parsed.qualifier ?? shortProcess(r.data.process), r.data.vendor]
+      .filter(Boolean)
+      .join(" · ");
+    return { entry: r, stats: computeRoastStats(r.data), parsed, sub };
+  });
+
+const refs = [
+  { href: "/roasts/methods/", title: "Methods & reference", sub: "how the numbers are computed" },
+  { href: "/roasts/behmor-2000ab/", title: "Behmor 2000 AB Plus", sub: "drum-roaster cheat sheet" },
+  { href: "/roasts/poppo/", title: "Poppo (air popper)", sub: "observed air-popper baselines" },
+  { href: "/roasts/behmor-video-notes/", title: "Behmor video notes", sub: "community technique breakdown" },
+];
 ---
 
-<Base title="roastbook">
-  <h1>Roast Log</h1>
-  <p class="intro">
-    Running log of home coffee roasts — what I dialed in, what happened in the
-    drum, and how the cup turned out. Click a roast for the full plan,
-    measurements, and notes.
-  </p>
+<Base title="Roastbook">
+  <section class="hero">
+    <h1 class="page-title">Roast Log</h1>
+    <p class="intro">
+      Running log of home coffee roasts — what I dialed in, what happened in the
+      drum, and how the cup turned out. Click a roast for the full plan,
+      measurements, and notes.
+    </p>
+  </section>
 
-  <p class="guides">
-    <a href={withBase("/roasts/methods/")}>→ Methods &amp; reference</a>
-    <span class="guides-hint">how the numbers are computed</span>
-    <br />
-    <a href={withBase("/roasts/behmor-2000ab/")}>→ Behmor 2000 AB Plus</a>
-    <span class="guides-hint">drum-roaster cheat sheet</span>
-    <br />
-    <a href={withBase("/roasts/poppo/")}>→ Poppo (air popper)</a>
-    <span class="guides-hint">observed air-popper baselines</span>
-    <br />
-    <a href={withBase("/roasts/behmor-video-notes/")}>→ Behmor video notes</a>
-    <span class="guides-hint">community technique breakdown</span>
-  </p>
-
-  <ul class="roast-list">
+  <nav class="refs">
     {
-      roasts.map(({ entry: r, stats }) => (
-        <li class="roast-item">
-          <a class="roast-link" href={withBase(`/roasts/${r.id}/`)}>
-            <span class="roast-title">
-              {r.data.title}
-              {r.data.draft && <span class="draft-badge">draft</span>}
-              {stats.ready && (
-                <span class={`roast-status roast-status-${stats.ready.status}`}>{stats.ready.status}</span>
-              )}
-            </span>
-            <span class="roast-sub">
-              <span class="roast-date">{r.data.date.toISOString().slice(0, 10)}</span>
-              <span class="roast-level">{r.data.target_level}</span>
-              {stats.lossPct != null && <span>{stats.lossPct}% loss</span>}
-              {stats.dtrPct != null && <span>{stats.dtrPct}% DTR</span>}
-              {r.data.rating != null && <span class="roast-rating">{r.data.rating}/10</span>}
-            </span>
-          </a>
-        </li>
+      refs.map((rf) => (
+        <a class="ref" href={withBase(rf.href)}>
+          <span class="ref-title">
+            <span class="ref-arrow">→</span>
+            {rf.title}
+          </span>
+          <span class="ref-sub">{rf.sub}</span>
+        </a>
       ))
     }
-  </ul>
+  </nav>
+
+  <div class="ledger-head">
+    <span class="section-label">Roast log</span>
+    <span class="entries metric">{roasts.length} entries</span>
+  </div>
+
+  <div class="ledger-cols">
+    <div class="col-thumb" aria-hidden="true"></div>
+    <div>#</div>
+    <div>Origin</div>
+    <div>Status</div>
+    <div>Date</div>
+    <div>Level</div>
+    <div class="r">Loss</div>
+    <div class="r">DTR</div>
+  </div>
+
+  <div class="ledger">
+    {
+      roasts.map(({ entry: r, stats, parsed, sub }) => (
+        <a class="row" href={withBase(`/roasts/${r.id}/`)}>
+          <div class="c-thumb">
+            {r.data.roasted_photo ? (
+              <Image
+                class="thumb"
+                src={r.data.roasted_photo}
+                width={52}
+                height={52}
+                alt={`Roasted beans for ${parsed.name}`}
+                loading="lazy"
+              />
+            ) : (
+              <span class="thumb thumb-empty" />
+            )}
+          </div>
+          <div class="c-num metric">{parsed.num ?? "—"}</div>
+          <div class="c-origin">
+            <div class="origin-name">
+              {parsed.name}
+              {r.data.draft && <span class="draft-badge">draft</span>}
+            </div>
+            {sub && <div class="origin-sub metric">{sub}</div>}
+          </div>
+          <div class="c-status">
+            {stats.ready ? (
+              <span class="status">
+                <span class={`dot-status ${stats.ready.status}`} />
+                {stats.ready.status}
+              </span>
+            ) : (
+              <span class="status muted">—</span>
+            )}
+          </div>
+          <div class="c-date metric">{fmtMonthDay(r.data.date)}</div>
+          <div class="c-level">
+            <span class="swatch" style={`background:${levelColor(r.data.target_level)}`} />
+            <span class="level-name metric">{r.data.target_level}</span>
+          </div>
+          <div class="c-loss metric">{stats.lossPct != null ? `${stats.lossPct}%` : "—"}</div>
+          <div class="c-dtr metric">{stats.dtrPct != null ? `${stats.dtrPct}%` : "—"}</div>
+        </a>
+      ))
+    }
+  </div>
 </Base>
 
 <style>
+  .hero {
+    margin-bottom: 4px;
+  }
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.05;
+    margin: 0 0 10px;
+  }
   .intro {
+    font-size: 13.5px;
+    line-height: 1.5;
     color: var(--muted);
-    margin-bottom: 1rem;
-  }
-  .guides {
-    margin: 0 0 1.5rem;
-    line-height: 1.9;
-  }
-  .guides-hint {
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-left: 0.4rem;
-  }
-  .roast-list {
-    list-style: none;
-    padding: 0;
+    max-width: 560px;
     margin: 0;
   }
-  .roast-item {
-    border-bottom: 1px solid rgba(127, 127, 127, 0.2);
+
+  /* Reference links */
+  .refs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
   }
-  .roast-link {
+  .ref {
+    display: block;
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+    padding: 11px 14px;
+    transition: border-color 0.15s;
+  }
+  .ref:hover {
+    border-color: var(--border-lift);
+  }
+  .ref-title {
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.75rem 0.25rem;
-    text-decoration: none;
-    color: inherit;
-  }
-  .roast-link:hover {
-    background: var(--bg-alt);
-  }
-  .roast-title {
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
     font-weight: 600;
-    color: #3b82f6;
+    color: var(--text);
   }
-  .draft-badge {
-    display: inline-block;
-    margin-left: 0.5em;
-    padding: 0.05em 0.5em;
-    border-radius: 999px;
-    font-size: 0.7em;
-    font-weight: 600;
+  .ref-arrow {
+    color: var(--accent);
+  }
+  .ref-sub {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--dim);
+    margin-top: 3px;
+    margin-left: 14px;
+  }
+
+  /* Ledger */
+  .ledger-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 28px 0 8px;
+  }
+  .entries {
+    font-size: 10.5px;
+    color: var(--dim);
+  }
+
+  .ledger-cols,
+  .row {
+    display: grid;
+    grid-template-columns: 30px 34px 1fr 84px 56px 96px 64px 60px;
+    gap: 10px;
+    align-items: center;
+  }
+  .ledger-cols {
+    padding: 0 4px 8px;
+    border-bottom: 1px solid var(--line-soft);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: #fff3cd;
-    color: #856404;
-    vertical-align: middle;
+    color: var(--dim);
   }
-  .roast-sub {
+  .ledger-cols .r {
+    text-align: right;
+  }
+
+  .row {
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--hair);
+    transition: background 0.12s;
+  }
+  .row:hover {
+    background: var(--surface-2);
+  }
+  .c-thumb {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    font-size: 0.85rem;
+    align-items: center;
+  }
+  .thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    display: block;
+    flex: 0 0 auto;
+  }
+  .thumb-empty {
+    background: var(--surface-2);
+    border-style: dashed;
+  }
+  .c-num {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .origin-name {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .origin-sub {
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 2px;
+  }
+  .c-status .status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--muted);
   }
-  .roast-level {
-    font-weight: 600;
+  .c-status .status.muted {
+    color: var(--dim);
   }
-  .roast-status {
-    display: inline-block;
-    margin-left: 0.5em;
-    padding: 0.05em 0.5em;
-    border-radius: 999px;
-    font-size: 0.7em;
-    font-weight: 600;
+  .c-status .status.past-peak {
+    color: var(--dim);
+  }
+  .c-date {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .c-level {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+  .level-name {
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .c-loss,
+  .c-dtr {
+    font-size: 13px;
+    text-align: right;
+    color: var(--text);
+  }
+
+  .draft-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 0 4px;
+    margin-left: 6px;
     vertical-align: middle;
   }
-  .roast-status-resting { background: #fff3cd; color: #856404; }
-  .roast-status-ready { background: #c8e6c9; color: #1b5e20; }
-  .roast-status-past-peak { background: #f8d7da; color: #721c24; }
+
+  /* Responsive: drop status/date/level on narrow screens, keep thumb, #, name,
+     loss, DTR. */
+  @media (max-width: 560px) {
+    .ledger-cols,
+    .row {
+      grid-template-columns: 26px 28px 1fr 52px 52px;
+      gap: 8px;
+    }
+    .ledger-cols div:nth-child(4),
+    .ledger-cols div:nth-child(5),
+    .ledger-cols div:nth-child(6),
+    .c-status,
+    .c-date,
+    .c-level {
+      display: none;
+    }
+  }
 </style>

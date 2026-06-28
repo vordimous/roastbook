@@ -91,12 +91,26 @@ YAML header.
 
 ## Roasted beans photo
 
-`roasted_photo` is Astro's `image()` field. The photo is **co-located next to
-the entry** in `src/content/roasts/` and referenced by a relative path
-(`roasted_photo: PXL_….jpg`); `image()` resolves it relative to the markdown
-file. The detail page renders it via `<Image>` (astro:assets), which optimizes
-to responsive WebP via `sharp` — multi-resolution `srcset` is on. In Sveltia,
-uploads should co-locate; confirm the written path is relative (not `/imgs/…`).
+`roasted_photo` is Astro's `image()` field. Photos live in the **centralized
+`src/assets/roasts/` folder** and are referenced from frontmatter by a path
+**relative to the entry** (`roasted_photo: ../../assets/roasts/015-roasted.jpg`).
+`image()` only optimizes images under `src/` and resolves the value relative to
+the markdown file — a `/public/...` path (what the CMS wrote before) is NOT a
+valid `image()` source and fails the build. Earlier roasts still co-locate a
+`PXL_….jpg` next to the entry; both forms resolve, but new uploads go to
+`src/assets/roasts/`.
+
+The image appears in two places (high-fidelity design): a **26×26 row thumbnail**
+in the index ledger (first column) and a **148×148 "specimen" plate** at the
+top-right of the detail header (caption `SPECIMEN · <num>`). Both render via
+`<Image>` (astro:assets) → responsive WebP via `sharp`.
+
+Sveltia writes the entry-relative path automatically: the roasts collection has
+`media_folder: ../../assets/roasts` + `public_folder: ../../assets/roasts`,
+emitted for any collection with an image field by `emit-sveltia-config.ts`
+(`hasImageField`). Confirm in the editor that an upload lands in
+`src/assets/roasts/` and the written path starts with `../../assets/` (not
+`/media/…`).
 
 ## Bean source
 
