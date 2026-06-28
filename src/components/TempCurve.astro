@@ -1,14 +1,25 @@
 ---
+import type { Phase } from "../lib/roastStats";
+
 // Bean-temp curve drawn from the button-log readings. Only renders when the
 // interventions log is a clean one-reading-per-line list of °F numbers (roast
 // 015's "pure-manual" format). Logs in other formats yield no curve.
+//
+// When the phase split is known it becomes the page's hero data viz: light
+// drying / Maillard / development bands sit behind the curve using the same
+// roast-level-key colors as the phase-split bar above, with boundaries at the
+// actual phase times (not even thirds), so the two visuals read as one system.
 interface Props {
   /** The raw `interventions` frontmatter string. */
   log?: string | null;
-  /** Elapsed time to first crack (mm:ss), shown on the FC marker caption. */
+  /** Drying / Maillard / development phases (their pct of total drives bands). */
+  phases?: Phase[];
+  /** Elapsed time to first crack (mm:ss), shown on the FC tick. */
   fcTime?: string | null;
+  /** Total roast time (mm:ss), shown on the drop tick. */
+  totalTime?: string | null;
 }
-const { log, fcTime } = Astro.props;
+const { log, phases, fcTime, totalTime } = Astro.props;
 
 // A line counts as a temperature only if the WHOLE line is a number — so button
 // presses ("D", "P3") and "mm:ss — pressed" lines are skipped, not misparsed.
@@ -18,23 +29,51 @@ const temps = (log ?? "")
   .filter((s) => /^\d+(?:\.\d+)?$/.test(s))
   .map(Number);
 
+const show = temps.length >= 2;
+
 const W = 340,
   H = 96,
   pad = 8;
-const peak = temps.length ? Math.max(...temps) : 0;
-const mn = temps.length ? Math.min(...temps) - 5 : 0;
+const n = temps.length;
+const peak = show ? Math.max(...temps) : 0;
+const mn = show ? Math.min(...temps) - 5 : 0;
 const mx = peak + 4;
 const span = mx - mn || 1;
 
-const x = (i: number) => pad + (i / (temps.length - 1)) * (W - 2 * pad);
+const x = (i: number) => pad + (i / (n - 1)) * (W - 2 * pad);
 const y = (v: number) => pad + (1 - (v - mn) / span) * (H - 2 * pad);
+// Same mapping for an arbitrary 0..1 fraction of the time axis.
+const xf = (f: number) => pad + f * (W - 2 * pad);
+const pctOf = (f: number) => (xf(f) / W) * 100;
 
-const points = temps.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+const points = show ? temps.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ") : "";
 const area = `${pad},${H - pad} ${points} ${W - pad},${H - pad}`;
-const peakIdx = temps.indexOf(peak);
+
+// Phase-band fractions (cumulative share of total time). pct is sec/total*100,
+// so these line up exactly with the phase-split bar's segment widths.
+const hasBands = !!phases && phases.length === 3;
+const dryFrac = hasBands ? phases![0].pct / 100 : 0;
+const fcFrac = hasBands
+  ? (phases![0].pct + phases![1].pct) / 100
+  : n > 1
+    ? temps.indexOf(peak) / (n - 1)
+    : 0;
+
+// FC marker: on the curve at the FC time fraction (interpolated), so the dot,
+// the FC tick, and the Maillard→development band boundary all coincide.
+const fp = fcFrac * (n - 1);
+const i0 = Math.max(0, Math.min(n - 2, Math.floor(fp)));
+const frac = fp - i0;
+const tempFc = show ? Math.round(temps[i0] + (temps[i0 + 1] - temps[i0]) * frac) : 0;
+const fcX = xf(fcFrac);
+const fcY = y(tempFc);
+
 const charge = temps[0];
-const drop = temps[temps.length - 1];
-const show = temps.length >= 2;
+const drop = temps[n - 1];
+
+// Band rectangles (full height; outer edges bleed to the viewBox edges).
+const Xd = xf(dryFrac);
+const Xf = xf(fcFrac);
 ---
 
 {
@@ -44,6 +83,7 @@ const show = temps.length >= 2;
         <span class="section-label">Bean temp — button log</span>
         <span class="curve-hint metric">°F / 30s</span>
       </div>
+
       <svg
         viewBox={`0 0 ${W} ${H}`}
         width="100%"
@@ -51,6 +91,13 @@ const show = temps.length >= 2;
         preserveAspectRatio="none"
         class="curve-svg"
       >
+        {hasBands && (
+          <g class="bands">
+            <rect x="0" y="0" width={Xd} height={H} fill="#C9A36B" opacity="0.12" />
+            <rect x={Xd} y="0" width={Xf - Xd} height={H} fill="#8A5A2B" opacity="0.12" />
+            <rect x={Xf} y="0" width={W - Xf} height={H} fill="#DD6B33" opacity="0.12" />
+          </g>
+        )}
         <polyline points={area} fill="var(--accent)" fill-opacity="0.08" stroke="none" />
         <polyline
           points={points}
@@ -61,18 +108,31 @@ const show = temps.length >= 2;
           stroke-linecap="round"
         />
         <circle
-          cx={x(peakIdx).toFixed(1)}
-          cy={y(peak).toFixed(1)}
+          cx={fcX.toFixed(1)}
+          cy={fcY.toFixed(1)}
           r="3"
           fill="var(--ink)"
           stroke="var(--accent)"
           stroke-width="1.6"
         />
       </svg>
-      <div class="curve-caption metric">
-        <span>charge {charge}°F</span>
-        <span class="fc">● FC ~{peak}°F{fcTime ? ` @ ${fcTime}` : ""}</span>
-        <span>drop {drop}°F</span>
+
+      <div class="curve-axis">
+        <div class="ax start" style={`left:${pctOf(0).toFixed(2)}%`}>
+          <span class="ax-tick" />
+          <span class="ax-evt">Charge</span>
+          <span class="ax-val metric">0:00 · {charge}°F</span>
+        </div>
+        <div class="ax mid" style={`left:${pctOf(fcFrac).toFixed(2)}%`}>
+          <span class="ax-tick" />
+          <span class="ax-evt">FC</span>
+          <span class="ax-val metric">{[fcTime, `${tempFc}°F`].filter(Boolean).join(" · ")}</span>
+        </div>
+        <div class="ax end" style={`left:${pctOf(1).toFixed(2)}%`}>
+          <span class="ax-tick" />
+          <span class="ax-evt">Drop</span>
+          <span class="ax-val metric">{[totalTime, `${drop}°F`].filter(Boolean).join(" · ")}</span>
+        </div>
       </div>
     </div>
   )
@@ -99,14 +159,49 @@ const show = temps.length >= 2;
     display: block;
     overflow: visible;
   }
-  .curve-caption {
-    display: flex;
-    justify-content: space-between;
-    font-size: 9.5px;
-    color: var(--dim);
+
+  .curve-axis {
+    position: relative;
+    height: 36px;
     margin-top: 8px;
   }
-  .curve-caption .fc {
+  .ax {
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .ax.start {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .ax.mid {
+    transform: translateX(-50%);
+    align-items: center;
+    text-align: center;
+  }
+  .ax.end {
+    transform: translateX(-100%);
+    align-items: flex-end;
+    text-align: right;
+  }
+  .ax-tick {
+    width: 1px;
+    height: 6px;
+    background: var(--dim);
+  }
+  .ax-evt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--muted);
+  }
+  .ax-val {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim);
+    white-space: nowrap;
   }
 </style>

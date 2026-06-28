@@ -21,7 +21,13 @@ const roasts = (await getCollection("roasts"))
       .filter(Boolean)
       .join(" · ");
     return { entry: r, stats: computeRoastStats(r.data), parsed, sub };
-  });
+  })
+  // Flag consecutive same-origin rows so the loud repeated name can recede and
+  // let the distinguishing sub-line (lot / intent) read instead.
+  .map((row, i, arr) => ({
+    ...row,
+    repeat: i > 0 && arr[i - 1].parsed.name === row.parsed.name,
+  }));
 
 const refs = [
   { href: "/roasts/methods/", title: "Methods & reference", sub: "how the numbers are computed" },
@@ -73,7 +79,7 @@ const refs = [
 
   <div class="ledger">
     {
-      roasts.map(({ entry: r, stats, parsed, sub }) => (
+      roasts.map(({ entry: r, stats, parsed, sub, repeat }) => (
         <a class="row" href={withBase(`/roasts/${r.id}/`)}>
           <div class="c-thumb">
             {r.data.roasted_photo ? (
@@ -91,7 +97,7 @@ const refs = [
           </div>
           <div class="c-num metric">{parsed.num ?? "—"}</div>
           <div class="c-origin">
-            <div class="origin-name">
+            <div class={`origin-name${repeat ? " repeat" : ""}`}>
               {parsed.name}
               {r.data.draft && <span class="draft-badge">draft</span>}
             </div>
@@ -99,7 +105,7 @@ const refs = [
           </div>
           <div class="c-status">
             {stats.ready ? (
-              <span class="status">
+              <span class={`status ${stats.ready.status}`}>
                 <span class={`dot-status ${stats.ready.status}`} />
                 {stats.ready.status}
               </span>
@@ -199,7 +205,7 @@ const refs = [
     padding: 0 4px 8px;
     border-bottom: 1px solid var(--line-soft);
     font-family: var(--font-mono);
-    font-size: 9.5px;
+    font-size: 10.5px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--dim);
@@ -244,9 +250,14 @@ const refs = [
     color: var(--text);
     line-height: 1.25;
   }
+  /* Repeated consecutive origin recedes so the sub-line differentiator leads. */
+  .origin-name.repeat {
+    font-weight: 400;
+    color: var(--muted);
+  }
   .origin-sub {
-    font-size: 10px;
-    color: var(--dim);
+    font-size: 10.5px;
+    color: var(--muted);
     margin-top: 2px;
   }
   .c-status .status {
@@ -257,11 +268,20 @@ const refs = [
     font-size: 11px;
     color: var(--muted);
   }
+  /* "ready" is the only actionable state — give it text-weight presence; the
+     others stay quiet (no color, hollow-ring dots). */
+  .c-status .status.ready {
+    color: var(--text);
+  }
   .c-status .status.muted {
     color: var(--dim);
   }
   .c-status .status.past-peak {
     color: var(--dim);
+  }
+  .c-status .dot-status {
+    width: 7px;
+    height: 7px;
   }
   .c-date {
     font-size: 11px;

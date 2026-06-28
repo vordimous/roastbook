@@ -42,6 +42,11 @@ function badgeText(
 const lossBadgeText = badgeText(stats.lossBadge, stats.lossPct, stats.targetLevel?.loss_pct);
 const dtrBadgeText = badgeText(stats.dtrBadge, stats.dtrPct, stats.targetLevel?.dtr_pct);
 
+// Only out-of-target deltas surface on the hero readout tiles; in-range tiles
+// stay neutral (the Measured rows still spell out "in range").
+const lossReadoutDelta = stats.lossBadge && stats.lossBadge !== "ok" ? lossBadgeText : null;
+const dtrReadoutDelta = stats.dtrBadge && stats.dtrBadge !== "ok" ? dtrBadgeText : null;
+
 // Render a long-form markdown frontmatter field to HTML (Hugo's `markdownify`).
 // Root-relative links authored in the notes ("/roasts/...") are rewritten to the
 // deploy base so they survive a project-site sub-path.
@@ -150,7 +155,9 @@ const sections = [
     }
   </div>
 
-  {stats.hasMeasurements && <RoastHeadline stats={stats} />}
+  {stats.hasMeasurements && (
+    <RoastHeadline stats={stats} lossDelta={lossReadoutDelta} dtrDelta={dtrReadoutDelta} />
+  )}
 
   <div class="two-col">
     <div>
@@ -204,7 +211,12 @@ const sections = [
 
   {stats.phases && <PhaseBar phases={stats.phases} />}
 
-  <TempCurve log={d.interventions} fcTime={d.time_to_fc} />
+  <TempCurve
+    log={d.interventions}
+    phases={stats.phases}
+    fcTime={d.time_to_fc}
+    totalTime={d.total_time}
+  />
 
   {
     (timingRows.length > 0 || noteRows.length > 0) && (
