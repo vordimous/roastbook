@@ -97,7 +97,9 @@ const home = withBase("/");
     --hair: #1d1a15;
     --text: #ece6da;
     --muted: #a39a88;
-    --dim: #6e665a;
+    /* --dim raised from #6e665a for WCAG-AA on the smallest mono micro-labels
+       (~3:1 → ~4.4:1 on --ink). Same value works on paper in the light theme. */
+    --dim: #857c6e;
     --accent: #dd6b33;
     --row-hover: #1a1712;
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -117,7 +119,9 @@ const home = withBase("/");
     --hair: #e2dbcc;
     --text: #2a2620;
     --muted: #6e665a;
-    --dim: #9a917f;
+    /* darkened from #9a917f so micro-labels clear AA on paper, staying lighter
+       than --muted to preserve the hierarchy. */
+    --dim: #857c6e;
     --accent: #b5511f;
     --row-hover: #e7e0d2;
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);

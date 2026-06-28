@@ -2,16 +2,21 @@
 import type { RoastStats } from "../lib/roastStats";
 interface Props {
   stats: RoastStats;
+  /** Out-of-target delta text for the Loss / DTR tiles (e.g. "under 0.7%"). */
+  lossDelta?: string | null;
+  dtrDelta?: string | null;
 }
-const { stats } = Astro.props;
+const { stats, lossDelta, dtrDelta } = Astro.props;
 const dash = "—";
 
+// The DTR/Loss tiles carry the same subtle delta the Measured fine print shows,
+// so the hero readout and the detail rows agree on what's out of target.
 const cells = [
-  { label: "FC", value: stats.fc ?? dash },
-  { label: "Total", value: stats.total ?? dash },
-  { label: "Dev", value: stats.dev ?? dash },
-  { label: "DTR", value: stats.dtrPct != null ? `${stats.dtrPct}%` : dash },
-  { label: "Loss", value: stats.lossPct != null ? `${stats.lossPct}%` : dash },
+  { label: "FC", value: stats.fc ?? dash, delta: null as string | null },
+  { label: "Total", value: stats.total ?? dash, delta: null },
+  { label: "Dev", value: stats.dev ?? dash, delta: null },
+  { label: "DTR", value: stats.dtrPct != null ? `${stats.dtrPct}%` : dash, delta: dtrDelta ?? null },
+  { label: "Loss", value: stats.lossPct != null ? `${stats.lossPct}%` : dash, delta: lossDelta ?? null },
 ];
 
 // Left-side label for the ready strip, per rest-window status.
@@ -29,6 +34,7 @@ const readyLabel = stats.ready ? READY_LABEL[stats.ready.status] : "";
       <div class="cell">
         <div class="cell-label">{c.label}</div>
         <div class="cell-value">{c.value}</div>
+        {c.delta && <div class="cell-delta">{c.delta}</div>}
       </div>
     ))
   }
@@ -67,7 +73,7 @@ const readyLabel = stats.ready ? READY_LABEL[stats.ready.status] : "";
   }
   .cell-label {
     font-family: var(--font-mono);
-    font-size: 9.5px;
+    font-size: 10.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--dim);
@@ -78,6 +84,12 @@ const readyLabel = stats.ready ? READY_LABEL[stats.ready.status] : "";
     font-weight: 500;
     color: var(--text);
     margin-top: 5px;
+  }
+  .cell-delta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    margin-top: 3px;
   }
 
   .ready-strip {
